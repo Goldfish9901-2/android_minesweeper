@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.amap.api.location.AMapLocation;
 
@@ -14,11 +15,9 @@ import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
 
 
-enum DBMode {
-	READ, WRITE
-}
 
 public class DBManager extends SQLiteOpenHelper {
 	final static int DB_VERSION = 1;
@@ -27,22 +26,22 @@ public class DBManager extends SQLiteOpenHelper {
 	final String db_path;
 	final String GAME_INFO_TABLE_NAME = "game_info";
 	final String ENTRY_RECORD_TABLE_NAME = "entry_record";
-	private final Map<String, String> SQLMetaData;
+	Timer timer;
 
-	private DBManager(@Nullable Context context,
+	private DBManager(@Nullable AppCompatActivity context,
 	                  @NotNull String db_path) {
 		super(context, db_path + '/' + DB_NAME, null,
 			DB_VERSION);
 		this.db_path = db_path;
-		SQLMetaData = Map.of("height", "INTEGER", "width",
-			"INTEGER", "mines", "INTEGER",
-			"difficulty_description", "TEXT", "end_time",
-			"INTEGER");
+		timer = new Timer("UPLOADER");
+		UpLoader upLoader = new UpLoader(context);
+		timer.schedule(upLoader, 0,
+			upLoader.delay_sec * 1000);
 	}
 
 	public static DBManager getInstance() {
 		if (manager == null)
-			throw new NullPointerException("DBManager is " + "not initialized");
+			throw new NullPointerException("DBManager is not initialized");
 		return manager;
 	}
 
@@ -55,7 +54,7 @@ public class DBManager extends SQLiteOpenHelper {
 	 * @return {@code DBManager}实例<br/>
 	 */
 
-	public static DBManager getInstance(@Nullable Context context, String dbPath) {
+	public static DBManager getInstance(@Nullable AppCompatActivity context, String dbPath) {
 		if (manager == null)
 			manager = new DBManager(context, dbPath);
 		return manager;

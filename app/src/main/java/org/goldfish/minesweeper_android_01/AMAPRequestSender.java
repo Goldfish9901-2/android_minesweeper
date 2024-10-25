@@ -18,11 +18,12 @@ public class AMAPRequestSender {
 	 * 单例模式
 	 */
 	private static AMAPRequestSender instance = null;
+	private final EntranceActivity activity;
 	/**
 	 * 高德地图定位客户端
 	 */
 	private AMapLocationClient locationClient = null;
-	private final EntranceActivity activity;
+	private AMapLocation location;
 
 	/**
 	 * @param context {@code EntranceActivity}实例
@@ -30,20 +31,19 @@ public class AMAPRequestSender {
 
 	private AMAPRequestSender(EntranceActivity context) {
 		this.activity = context;
+		location = null;
 		try {
-			AMapLocationClient.updatePrivacyAgree(context,
-				true);
-			AMapLocationClient.updatePrivacyShow(context,
-				true, true);
+			AMapLocationClient.updatePrivacyAgree(context, true);
+			AMapLocationClient.updatePrivacyShow(context, true, true);
 
-			locationClient =
-				new AMapLocationClient(context);
+			locationClient = new AMapLocationClient(context);
 			AMapLocationClientOption locationOption =
 				new AMapLocationClientOption();
 			locationOption.setOnceLocationLatest(true);
 			locationOption.setBeidouFirst(true);
 			locationClient.setLocationOption(locationOption);
 			locationClient.setLocationListener(new GFLocationListener());
+			locationClient.startLocation();
 		} catch (Exception ignored) {
 		}
 	}
@@ -60,9 +60,9 @@ public class AMAPRequestSender {
 		if (instance == null) try {
 			instance = new AMAPRequestSender(context);
 		} catch (Exception e) {
-			String message = "AMAPRequestSender: " +
-				"cannot " + "create " + "instance";
-			Log.w(thrower, message);
+			String message = "AMAPRequestSender: " + "cannot " + "create " +
+				"instance";
+			Log.w(AMAPRequestSender.class.toString(), message);
 		}
 		return (instance);
 	}
@@ -77,12 +77,16 @@ public class AMAPRequestSender {
 
 	public static AMAPRequestSender getInstance() {
 		if (instance == null) {
-			String message = "AMAPRequestSender: " +
-				"instance " + "not created";
+			String message = "AMAPRequestSender: " + "instance " + "not " +
+				"created";
 			Log.w(thrower, message);
 			throw new NullPointerException(message);
 		}
 		return instance;
+	}
+
+	public AMapLocation getLocation() {
+		return location;
 	}
 
 	/**
@@ -93,8 +97,7 @@ public class AMAPRequestSender {
 		try {
 			locationClient.startLocation();
 		} catch (Exception e) {
-			String message =
-				"AMAPRequestSender: " + e.getMessage();
+			String message = "AMAPRequestSender: " + e.getMessage();
 			Log.w(thrower, message, e);
 		}
 	}
@@ -102,24 +105,24 @@ public class AMAPRequestSender {
 	private class GFLocationListener implements AMapLocationListener {
 
 		@Override
-		public void onLocationChanged(AMapLocation location) {
+		public synchronized void onLocationChanged(AMapLocation location) {
 			if (location == null) {
-				Log.w(thrower, "onLocationChanged: " +
-					"null");
+				Log.w(thrower, "onLocationChanged: " + "null");
 				return;
 			}
 			if (location.getErrorCode() != 0) {
-				Log.w(thrower, "onLocationChanged: " +
-					"error");
+				Log.w(thrower, "onLocationChanged: " + "error");
 				return;
 			}
 			try {
 				EntranceRecorder.getInstance().updateLocation(location);
 				activity.updateListeners();
 				locationClient.stopLocation();
+				AMAPRequestSender.this.location = location;
+				System.out.println("location: " + location);
 			} catch (Exception e) {
-				Log.w(thrower, "onLocationChanged: " +
-					"error", e);
+				Log.w(GFLocationListener.class.toString(), "onLocationChanged"
+					, e);
 			}
 		}
 	}
