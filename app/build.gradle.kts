@@ -50,3 +50,6 @@ dependencies {
 dependencies{
     implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
 }
+dependencies {
+    implementation("mysql:mysql-connector-java:5.1.49")
+}

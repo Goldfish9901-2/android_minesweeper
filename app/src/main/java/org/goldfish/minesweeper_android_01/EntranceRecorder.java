@@ -58,7 +58,7 @@ public class EntranceRecorder {
 	 */
 
 	public synchronized void onExitRecord() throws Exception {
-		Log.i(EntranceActivity.TAG, "onExitRecord: ");
+		Log.i(thrower, "onExitRecord: ");
 		if (enterTime == null) {
 			throw new Exception("onEntryRecord() is not " + "called");
 		}

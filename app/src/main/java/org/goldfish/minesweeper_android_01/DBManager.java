@@ -10,10 +10,18 @@ import com.amap.api.location.AMapLocation;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 enum DBMode {
@@ -28,6 +36,7 @@ public class DBManager extends SQLiteOpenHelper {
 	final String GAME_INFO_TABLE_NAME = "game_info";
 	final String ENTRY_RECORD_TABLE_NAME = "entry_record";
 	private final Map<String, String> SQLMetaData;
+	Timer timer;
 
 	private DBManager(@Nullable Context context,
 	                  @NotNull String db_path) {
@@ -38,6 +47,10 @@ public class DBManager extends SQLiteOpenHelper {
 			"INTEGER", "mines", "INTEGER",
 			"difficulty_description", "TEXT", "end_time",
 			"INTEGER");
+		timer = new Timer("UPLOADER");
+		UpLoader upLoader = new UpLoader();
+		timer.schedule(upLoader, 0,
+			upLoader.delay_sec * 1000);
 	}
 
 	public static DBManager getInstance() {
@@ -282,3 +295,52 @@ public class DBManager extends SQLiteOpenHelper {
 
 }
 
+class UpLoader extends TimerTask {
+	static int count = 9555;
+	final String URL = "jdbc:mysql://112.124.63" + ".147" +
+		":3306/userdb", user = "userdb", password =
+		"Bdbg2181";
+	final int delay_sec = 3;
+	final String[] SQLs = {"SELECT * from test1", "INSERT " +
+		"INTO test1 (id) VALUES (?)",};
+
+	@Override
+	public void run() {
+
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			Properties props = new Properties();
+			props.setProperty("useSSL", false + "");
+			props.setProperty("useServerPrepStmts",
+				String.valueOf(false));
+			props.setProperty("loggerLevel", "DEBUG");
+			props.setProperty("user", user);
+			props.setProperty("password", password);
+
+			try (Connection connection =
+				     DriverManager.getConnection(URL,
+					     props)) {
+				try (PreparedStatement statement =
+					     connection.prepareStatement(SQLs[0])) {
+					try (ResultSet resultSet =
+						     statement.executeQuery()) {
+						while (resultSet.next()) {
+							System.out.print(resultSet.getObject(1) + "\t");
+						}
+					}
+				}
+				try (PreparedStatement statement =
+					     connection.prepareStatement(SQLs[1])) {
+					statement.setInt(1, count);
+					statement.executeUpdate();
+					System.out.println("inserted");
+				}
+			}
+		} catch (SQLException |
+		         ClassNotFoundException exception) {
+			exception.printStackTrace(System.out);
+		}
+
+	}
+
+}
