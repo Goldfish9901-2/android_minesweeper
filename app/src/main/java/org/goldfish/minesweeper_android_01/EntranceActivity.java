@@ -5,8 +5,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -14,9 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 
@@ -24,7 +25,10 @@ import java.io.File;
 public class EntranceActivity extends AppCompatActivity implements Resources {
 
 	private static final int REQUEST_CODE_PERMISSIONS = 1001;
-	Button easyButton, mediumButton, hardButton, recordButton;
+	Button easyButton, mediumButton, hardButton,
+		recordButton;
+	TextView
+	privacyButton;
 	SQLiteDatabase db;
 
 	public EntranceActivity() {
@@ -47,7 +51,8 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
 		mediumButton = findViewById(R.id.medium_mode_button);
 		hardButton = findViewById(R.id.hard_mode_button);
 		recordButton = findViewById(R.id.record_button);
-
+		privacyButton=findViewById(R.id.privacy_collection_entrance);
+		
 		easyButton.setOnClickListener(listener);
 		mediumButton.setOnClickListener(listener);
 		hardButton.setOnClickListener(listener);
@@ -80,15 +85,7 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
 
 		});
 
-		ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v,
-		                                                                    insets) -> {
-			Insets systemBars =
-				insets.getInsets(WindowInsetsCompat.Type.systemBars());
-			v.setPadding(systemBars.left, systemBars.top, systemBars.right,
-				systemBars.bottom);
-			return insets;
-		});
-
+		privacyButton.setOnClickListener(v -> startActivity(new Intent(this, PrivacyCollectionActivity.class)));
 
 	}
 
@@ -111,6 +108,12 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
 			} else {
 				Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
 			}
+			if (grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+				Toast.makeText(this, "未授权",
+					Toast.LENGTH_SHORT).show();
+				return;
+			}
+			updateListeners();
 		}
 	}
 
