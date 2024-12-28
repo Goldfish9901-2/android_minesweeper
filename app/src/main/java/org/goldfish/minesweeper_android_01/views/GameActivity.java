@@ -1,5 +1,6 @@
 package org.goldfish.minesweeper_android_01.views;
 //GameActivity.java
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -29,7 +30,6 @@ public class GameActivity extends AppCompatActivity implements Resources {
     private Button restartButton;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,7 +38,7 @@ public class GameActivity extends AppCompatActivity implements Resources {
 
         Intent intent = getIntent();
         GridLayout layout;
-        if(intent instanceof Result) {
+        if (intent instanceof Result) {
             mode = (Result) intent;
         }
         int height = intent.getIntExtra("height", 10);
@@ -46,7 +46,7 @@ public class GameActivity extends AppCompatActivity implements Resources {
         int mines = intent.getIntExtra("mines", 10);
         String difficulty_description = intent.getStringExtra("difficulty_description");
 
-        controller = new Controller(height, width, mines,difficulty_description);
+        controller = new Controller(height, width, mines, difficulty_description);
         controller.setActivity(this);
 
         Toast.makeText(this, String.format(Locale.CHINA, "模式: %s 高度: %d, 宽度: %d, 雷数: %d", difficulty_description, height, width, mines), Toast.LENGTH_SHORT).show();
@@ -66,14 +66,14 @@ public class GameActivity extends AppCompatActivity implements Resources {
             layout.setRowCount(height);
 
             exitButton = findViewById(R.id.exit_button);
-            exitButton.setOnClickListener(v->{
+            exitButton.setOnClickListener(v -> {
                 Controller.promptAndExit(this);
             });
             restartButton = findViewById(R.id.restart_button);
-            restartButton.setOnClickListener(v->{
-                startActivity(new Intent(this, EntranceActivity.class));
+            restartButton.setOnClickListener(v -> {
+                finish();
+//                startActivity(new Intent(this, EntranceActivity.class));
             });
-
 
 
         } catch (NullPointerException nullPointerException) {

@@ -1,7 +1,6 @@
 package org.goldfish.minesweeper_android_01.views;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TableLayout;
@@ -39,7 +38,8 @@ public class RecordActivity extends AppCompatActivity {
 
         Button backButton = findViewById(R.id.recoord_return_button);
         backButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, EntranceActivity.class));
+            finish();
+//            startActivity(new Intent(this, EntranceActivity.class));
         });
     }
 

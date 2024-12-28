@@ -11,12 +11,15 @@ import androidx.fragment.app.FragmentTransaction;
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.Resources;
+import org.goldfish.minesweeper_android_01.fragment.CustomModeFragment;
+import org.goldfish.minesweeper_android_01.fragment.ModeSelectFragment;
 
 
 public class EntranceActivity extends AppCompatActivity implements Resources {
-    String TAG= MainApplication.TAG;
+    String TAG = MainApplication.TAG;
     FragmentContainerView fragmentContainerView;
     CustomModeFragment customModeFragment;
+    Bundle savedInstanceState;
 
     public EntranceActivity() {
     }
@@ -24,6 +27,7 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.savedInstanceState = savedInstanceState;
 
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
@@ -36,8 +40,10 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
     protected void onResume() {
         super.onResume();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.add(customModeFragment, "customModeFragment");
+//        transaction.add(R.id.nav_host_fragment_container, CustomModeFragment.class, savedInstanceState);
+        transaction.add(R.id.nav_host_fragment_container, ModeSelectFragment.class, savedInstanceState);
+        transaction.addToBackStack(null);
         int result = transaction.commit();
-        Log.i(TAG, "onResume: "+result);
+        Log.i(TAG, "onResume: " + result);
     }
 }

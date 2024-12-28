@@ -30,5 +30,7 @@
     <string name="hello_blank_fragment">请定义你的难度</string>
     <string name="custom_width_prompt">自定义宽度</string>
     <string name="custom_height_prompt">自定义高度</string>
+    <string name="custom_mine_prompt">自定义雷数</string>
+    <string name="custom_start_button_label">开始</string>
 
 </resources>

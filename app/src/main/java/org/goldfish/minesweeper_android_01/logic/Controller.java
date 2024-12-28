@@ -32,8 +32,7 @@ public class Controller {
 	Set<Grid> finishedGrids;
 	GameActivity activity;
 	Chronometer chronometer;
-	private final String difficulty_description;
-	private int used;
+    private int used;
 	private boolean finished;
 
 	/**
@@ -47,8 +46,7 @@ public class Controller {
 	public Controller(int height, int width, int mines, String difficulty_description) {
 		this.height = height;
 		this.width = width;
-		this.difficulty_description = difficulty_description;
-		this.mines = mines;
+        this.mines = mines;
 
 		this.used = 0;
 		this.grids = new Grid[height][width];
