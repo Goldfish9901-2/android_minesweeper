@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.logic;
 
 public class MineTriggeredException extends Exception {
     public MineTriggeredException(String message) {

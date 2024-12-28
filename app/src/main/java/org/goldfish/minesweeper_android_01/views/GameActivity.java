@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.views;
 //GameActivity.java
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,13 +10,19 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.goldfish.minesweeper_android_01.R;
+import org.goldfish.minesweeper_android_01.Resources;
+import org.goldfish.minesweeper_android_01.entity.Result;
+import org.goldfish.minesweeper_android_01.logic.Controller;
+import org.goldfish.minesweeper_android_01.logic.Grid;
+
 import java.util.Locale;
 
-public class GameActivity extends AppCompatActivity implements Resources{
+public class GameActivity extends AppCompatActivity implements Resources {
 
     private Controller controller;
 
-    private Mode mode;
+    private Result mode;
 
     private TextView minePrompt;
     private Button exitButton;
@@ -32,8 +38,8 @@ public class GameActivity extends AppCompatActivity implements Resources{
 
         Intent intent = getIntent();
         GridLayout layout;
-        if(intent instanceof Mode) {
-            mode = (Mode) intent;
+        if(intent instanceof Result) {
+            mode = (Result) intent;
         }
         int height = intent.getIntExtra("height", 10);
         int width = intent.getIntExtra("width", 10);
@@ -94,7 +100,7 @@ public class GameActivity extends AppCompatActivity implements Resources{
         );
     }
 
-    Controller getController() {
+    public Controller getController() {
         return controller;
     }
 

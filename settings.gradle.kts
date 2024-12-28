@@ -1,4 +1,15 @@
 pluginManagement {
+
+    repositories {
+        maven {
+            url=uri ("https://maven.aliyun.com/repository/public/")
+        }
+        maven {
+            url =uri("https://maven.aliyun.com/repository/spring/")
+        }
+        mavenLocal()
+        mavenCentral()
+    }
     repositories {
         google {
             content {
@@ -10,6 +21,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)

@@ -1,5 +1,6 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.logic;
 
+import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Chronometer;
@@ -8,6 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import org.goldfish.minesweeper_android_01.views.GameActivity;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -52,7 +55,7 @@ public class Controller {
 		this.finished = false;
 	}
 
-	static void promptAndExit(AppCompatActivity activity) {
+	public static void promptAndExit(Context activity) {
 		Toast.makeText(activity, "下次扫雷再见！", Toast.LENGTH_SHORT).show();
 		System.exit(0);
 	}
@@ -92,38 +95,43 @@ public class Controller {
 			for (int col = 0; col < width; col++) {
 				Grid grid = grids[row][col];
 				//在九宫格范围内寻找相邻格
-				for (int d_row = -1; d_row <= 1; d_row++) {
-					for (int d_col = -1; d_col <= 1; d_col++) {
-						if (d_row == 0 && d_col == 0) continue;
-						//起点格坐标
-
-						int neighbor_candidate_row = row + d_row;
-						int neighbor_candidate_col = col + d_col;
-						//候选坐标生成
-
-						if (neighbor_candidate_row < 0) continue;//超上界
-						if (neighbor_candidate_row >= height) continue;//超下界
-						if (neighbor_candidate_col < 0) continue;//超左界
-						if (neighbor_candidate_col >= width) continue;//超右界
-
-						Grid gridCandidate = grids[neighbor_candidate_row][neighbor_candidate_col];
-						if (gridCandidate == null) {
-							String messageBuf = "(" + neighbor_candidate_row + "," + neighbor_candidate_col + ')';
-							Log.w("GOLDFISH_SELF_CAUGHT", messageBuf);
-							return;
-						}
-
-						if (grid.addNeighbor(gridCandidate)) continue;
-
-						//添加邻居不成功 则执行以下处理
-						if (activity == null)
-							throw new NullPointerException("Call SetActivity first");
-						Toast.makeText(activity, "邻接错误", Toast.LENGTH_SHORT).show();
-						return;
-					}
-				}
+				if (findGridSurrounding(row, col, grid)) return;
 			}
 		}
+	}
+
+	private boolean findGridSurrounding(int row, int col, Grid grid) {
+		for (int d_row = -1; d_row <= 1; d_row++) {
+			for (int d_col = -1; d_col <= 1; d_col++) {
+				if (d_row == 0 && d_col == 0) continue;
+				//起点格坐标
+
+				int neighbor_candidate_row = row + d_row;
+				int neighbor_candidate_col = col + d_col;
+				//候选坐标生成
+
+				if (neighbor_candidate_row < 0) continue;//超上界
+				if (neighbor_candidate_row >= height) continue;//超下界
+				if (neighbor_candidate_col < 0) continue;//超左界
+				if (neighbor_candidate_col >= width) continue;//超右界
+
+				Grid gridCandidate = grids[neighbor_candidate_row][neighbor_candidate_col];
+				if (gridCandidate == null) {
+					String messageBuf = "(" + neighbor_candidate_row + "," + neighbor_candidate_col + ')';
+					Log.w("GOLDFISH_SELF_CAUGHT", messageBuf);
+					return true;
+				}
+
+				if (grid.addNeighbor(gridCandidate)) continue;
+
+				//添加邻居不成功 则执行以下处理
+				if (activity == null)
+					throw new NullPointerException("Call SetActivity first");
+				Toast.makeText(activity, "邻接错误", Toast.LENGTH_SHORT).show();
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -371,13 +379,13 @@ public class Controller {
 	}
 
 	/** 输掉游戏*/
-	void Lose() {
+	public void Lose() {
 		this.finished = true;
 		reveal();
 		getFinishDialog(false).show();
 	}
 
-	void updateState() {
+	public void updateState() {
 		for (Grid[] row : grids) {
 			for (Grid g : row)
 				g.updateState();
@@ -388,7 +396,7 @@ public class Controller {
 	 * 显示所有格子 告诉用户输掉的原因
 	 */
 
-	void reveal() {
+	public void reveal() {
 		for (Grid[] row : grids) {
 			for (Grid g : row) {
 				try {
@@ -408,7 +416,7 @@ public class Controller {
 	 * @return 对话框
 	 */
 
-	AlertDialog getFinishDialog(boolean win) {
+	public AlertDialog getFinishDialog(boolean win) {
 		finished = true;
 		for (Grid[] row : grids) {
 			for (Grid g : row) {
@@ -423,8 +431,7 @@ public class Controller {
 		timeUsed /= 1000;
 		String content = "用时：" + timeUsed + "秒";
 
-		if (win)
-			DBManager.getInstance().onWinWrite(new Result(difficulty_description, mines,  width, height, timeUsed));
+
 		builder.setTitle(title);
 		builder.setMessage(content);
 

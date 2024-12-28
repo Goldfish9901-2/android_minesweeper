@@ -26,5 +26,9 @@
     <string name="records_time">时间</string>
     <string name="records_fields_size">地图大小</string>
     <string name="difficulty">难度</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">请定义你的难度</string>
+    <string name="custom_width_prompt">自定义宽度</string>
+    <string name="custom_height_prompt">自定义高度</string>
 
 </resources>

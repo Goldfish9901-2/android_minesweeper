@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "org.goldfish.minesweeper_android_01"
-        minSdk = 24
+        minSdk = 28
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -47,7 +47,37 @@ dependencies {
     androidTestImplementation(libs.espresso.core)
 }
 dependencies{
-    implementation(files("src\\main\\libs\\AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
-    implementation(files("src\\main\\libs\\AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
-    implementation(files("src\\main\\libs\\AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
+    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
+    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
+    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
+}
+dependencies {
+
+    implementation(libs.room.runtime)
+
+//    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
+//    // See Add the KSP plugin to your project
+//    ksp("androidx.room:room-compiler:$room_version")
+
+    // If this project only uses Java source, use the Java annotationProcessor
+    // No additional plugins are necessary
+    annotationProcessor(libs.room.compiler)
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.room.ktx)
+
+    // optional - RxJava2 support for Room
+    implementation(libs.androidx.room.room.rxjava22)
+
+    // optional - RxJava3 support for Room
+    implementation(libs.androidx.room.room.rxjava32)
+
+    // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation(libs.androidx.room.guava)
+
+    // optional - Test helpers
+    testImplementation(libs.androidx.room.testing)
+
+    // optional - Paging 3 Integration
+    implementation(libs.room.paging)
 }

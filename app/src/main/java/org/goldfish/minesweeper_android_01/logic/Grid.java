@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.logic;
 //Grid.java
 
 import android.graphics.Color;
@@ -10,6 +10,10 @@ import android.widget.GridLayout;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
+
+import org.goldfish.minesweeper_android_01.views.GameActivity;
+import org.goldfish.minesweeper_android_01.R;
+import org.goldfish.minesweeper_android_01.Resources;
 
 import java.util.HashSet;
 import java.util.Set;
