@@ -1,5 +1,6 @@
 package org.goldfish.minesweeper_android_01.entity;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -12,6 +13,7 @@ public class GFTime {
     private int id;
     @Ignore
     private final LocalDateTime time;
+    private int year;
     private int month;
     private int day;
     private int hour;
@@ -20,11 +22,20 @@ public class GFTime {
 
     public GFTime() {
         time = LocalDateTime.now();
+        setYear(time.getYear());
         setMonth(time.getMonthValue());
         setDay(time.getDayOfMonth());
         setHour(time.getHour());
         setMinute(time.getMinute());
         setSecond(time.getSecond());
+    }
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
     }
 
 
@@ -79,4 +90,18 @@ public class GFTime {
     public LocalDateTime getTime() {
         return time;
     }
+
+    @NonNull
+    @Override
+    public String toString() {
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append(month).append("/")
+                .append(day).append("-")
+                .append(hour).append(":")
+                .append(minute).append(":")
+                .append(second);
+        return stringBuffer.toString();
+    }
+
+
 }

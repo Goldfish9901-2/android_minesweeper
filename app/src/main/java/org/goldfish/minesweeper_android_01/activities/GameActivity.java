@@ -1,9 +1,8 @@
-package org.goldfish.minesweeper_android_01.views;
+package org.goldfish.minesweeper_android_01.activities;
 //GameActivity.java
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.GridLayout;
 import android.widget.TextView;
@@ -12,22 +11,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.goldfish.minesweeper_android_01.R;
-import org.goldfish.minesweeper_android_01.Resources;
 import org.goldfish.minesweeper_android_01.entity.Result;
+import org.goldfish.minesweeper_android_01.entity.ResultFieldNames;
 import org.goldfish.minesweeper_android_01.logic.Controller;
 import org.goldfish.minesweeper_android_01.logic.Grid;
 
 import java.util.Locale;
 
-public class GameActivity extends AppCompatActivity implements Resources {
+public class GameActivity extends AppCompatActivity implements ResultFieldNames {
 
     private Controller controller;
 
     private Result mode;
 
     private TextView minePrompt;
-    private Button exitButton;
-    private Button restartButton;
 
 
     @Override
@@ -41,9 +38,9 @@ public class GameActivity extends AppCompatActivity implements Resources {
         if (intent instanceof Result) {
             mode = (Result) intent;
         }
-        int height = intent.getIntExtra("height", 10);
-        int width = intent.getIntExtra("width", 10);
-        int mines = intent.getIntExtra("mines", 10);
+        int height = intent.getIntExtra(HEIGHT, 10);
+        int width = intent.getIntExtra(WIDTH, 10);
+        int mines = intent.getIntExtra(MINE_COUNT, 10);
         String difficulty_description = intent.getStringExtra("difficulty_description");
 
         controller = new Controller(height, width, mines, difficulty_description);
@@ -58,22 +55,17 @@ public class GameActivity extends AppCompatActivity implements Resources {
             chronometer.setBase(0);
             controller.setChronometer(chronometer);
 
-            minePrompt = findViewById(R.id.mine_counter);
+            minePrompt=findViewById(R.id.mine_counter);
             minePrompt.setText(String.valueOf(mines));
 
             layout = findViewById(R.id.grids_field);
             layout.setColumnCount(width);
             layout.setRowCount(height);
 
-            exitButton = findViewById(R.id.exit_button);
-            exitButton.setOnClickListener(v -> {
-                Controller.promptAndExit(this);
-            });
-            restartButton = findViewById(R.id.restart_button);
-            restartButton.setOnClickListener(v -> {
-                finish();
-//                startActivity(new Intent(this, EntranceActivity.class));
-            });
+            findViewById(R.id.exit_button).setOnClickListener(
+                    v -> Controller.promptAndExit(this));
+            findViewById(R.id.restart_button).setOnClickListener(
+                    v -> finish());
 
 
         } catch (NullPointerException nullPointerException) {
@@ -89,17 +81,6 @@ public class GameActivity extends AppCompatActivity implements Resources {
         controller.findSurroundings();
     }
 
-    void addExitButton(boolean finished) {
-        exitButton.setOnClickListener(
-                v -> Controller.promptAndExit(this)
-        );
-        restartButton.setOnClickListener(
-                v -> {
-                    startActivity(new Intent(this, EntranceActivity.class));
-                }
-        );
-    }
-
     public Controller getController() {
         return controller;
     }
@@ -108,11 +89,4 @@ public class GameActivity extends AppCompatActivity implements Resources {
         return minePrompt;
     }
 
-    public Button getExitButton() {
-        return exitButton;
-    }
-
-    public Button getRestartButton() {
-        return restartButton;
-    }
 }

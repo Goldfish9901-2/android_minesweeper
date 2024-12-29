@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.views;
+package org.goldfish.minesweeper_android_01.activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
+import org.goldfish.minesweeper_android_01.entity.GFTime;
 import org.goldfish.minesweeper_android_01.entity.Result;
 
 import java.util.List;
@@ -34,13 +35,10 @@ public class RecordActivity extends AppCompatActivity {
         });
         List<Result> records = MainApplication.getInstance().getDao().getWinRecords();
         tableLayout = findViewById(R.id.record_table);
-        RecordView recordView = new RecordView(this, records);
+        new RecordView(this, records);
 
         Button backButton = findViewById(R.id.recoord_return_button);
-        backButton.setOnClickListener(v -> {
-            finish();
-//            startActivity(new Intent(this, EntranceActivity.class));
-        });
+        backButton.setOnClickListener(v -> finish());
     }
 
     class RecordView {
@@ -64,16 +62,21 @@ class RecordRow extends TableRow {
         super(context);
         setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
         setBackgroundResource(R.drawable.table_row_bg); // Assuming you have a drawable for row background
+        if (record.getStartTimeID() == -1)
+            return;
+
+        GFTime time = MainApplication.getInstance().getDao().getTimeById(record.getStartTimeID());
+
 
         RecordCell minesCell = new RecordCell(context, record.getMineCount());
         RecordCell fieldSizeCell = new RecordCell(context, record.getHeight() + "*" + record.getWidth());
-        RecordCell timeCell = new RecordCell(context, record.getStartTime());
         RecordCell difficultyCell = new RecordCell(context, record.getDifficultyDescription());
-
+        RecordCell timeCell = new RecordCell(context, time.toString());
         addView(difficultyCell);
         addView(fieldSizeCell);
         addView(minesCell);
-        addView(timeCell);
+
+
     }
 }
 

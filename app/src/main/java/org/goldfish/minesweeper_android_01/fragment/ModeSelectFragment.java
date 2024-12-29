@@ -6,19 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.RefinedModeSelectListener;
 import org.goldfish.minesweeper_android_01.entity.Result;
-import org.goldfish.minesweeper_android_01.views.EntranceActivity;
-import org.goldfish.minesweeper_android_01.views.RecordActivity;
+import org.goldfish.minesweeper_android_01.activities.EntranceActivity;
+import org.goldfish.minesweeper_android_01.activities.RecordActivity;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,7 +29,6 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
     public ModeSelectFragment() {
         // Required empty public constructor
     }
-
 
 
     @Override
@@ -52,9 +47,9 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
         recordButton = view.findViewById(R.id.record_button);
         customButton = view.findViewById(R.id.custom_mode_button);
 
-        easyButton.setOnClickListener(new RefinedModeSelectListener(Result.EASY(), requireActivity()));
-        mediumButton.setOnClickListener(new RefinedModeSelectListener(Result.MEDIUM(), requireActivity()));
-        hardButton.setOnClickListener(new RefinedModeSelectListener(Result.HARD(), requireActivity()));
+        easyButton.setOnClickListener(new RefinedModeSelectListener(Result.EASY(requireActivity()), requireActivity()));
+        mediumButton.setOnClickListener(new RefinedModeSelectListener(Result.MEDIUM(requireActivity()), requireActivity()));
+        hardButton.setOnClickListener(new RefinedModeSelectListener(Result.HARD(requireActivity()), requireActivity()));
 
         recordButton.setOnClickListener(v ->
                 startActivity(new Intent(view.getContext(), RecordActivity.class)));
@@ -72,5 +67,6 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
         });
         return view;
     }
+
 
 }

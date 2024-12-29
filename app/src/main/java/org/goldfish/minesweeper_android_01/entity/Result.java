@@ -1,5 +1,6 @@
 package org.goldfish.minesweeper_android_01.entity;
 
+import android.app.Activity;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
@@ -8,40 +9,15 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
+import org.goldfish.minesweeper_android_01.activities.GameActivity;
 
 import java.time.ZoneOffset;
 
 /**
  * {@code Result} 游戏结果信息 <br/>
  */
-@Entity(tableName = "Result")
-public class Result extends Intent {
-
-    public static Result EASY(){
-        Result result = new Result();
-        result.setHeight(9);
-        result.setWidth(9);
-        result.setMineCount(10);
-        result.setDifficulty_description("简单");
-        return result;
-
-    }
-    public static Result MEDIUM(){
-        Result result = new Result();
-        result.setHeight(16);
-        result.setWidth(16);
-        result.setMineCount(40);
-        result.setDifficulty_description("中等");
-        return result;
-    };
-    public static final Result HARD(){
-        Result result = new Result();
-        result.setHeight(30);
-        result.setWidth(16);
-        result.setMineCount(99);
-        result.setDifficulty_description("困难");
-        return result;
-    }
+@Entity
+public class Result extends Intent implements ResultFieldNames{
 
     /**
      * 数据库存储字段
@@ -52,6 +28,7 @@ public class Result extends Intent {
      * 雷区高度
      */
     int height;
+
     /**
      * 雷区宽度
      */
@@ -71,14 +48,59 @@ public class Result extends Intent {
     Boolean win;
     @Ignore
     long interval;
-
+    /**
+     * 开始时间
+     * 指向{@link GFTime}数据库表中的记录
+     * @see org.goldfish.minesweeper_android_01.entity.GFTime
+     */
     int startTimeID;
+    /**
+     * 结束时间
+     * @see #startTimeID
+     */
     int endTimeID;
 
-    public Result() {
+    public Result(Activity activity) {
+        super(activity, GameActivity.class);
         startTimeID = -1;
         endTimeID = -1;
         win = null;
+    }
+
+    public Result() {
+        super();
+        startTimeID = -1;
+        endTimeID = -1;
+        win = null;
+    }
+
+
+    public static Result EASY(Activity activity) {
+        Result result = new Result(activity);
+        result.setHeight(9);
+        result.setWidth(9);
+        result.setMineCount(10);
+        result.setDifficulty_description("简单");
+        return result;
+
+    }
+
+    public static Result MEDIUM(Activity activity) {
+        Result result = new Result(activity);
+        result.setHeight(16);
+        result.setWidth(16);
+        result.setMineCount(40);
+        result.setDifficulty_description("中等");
+        return result;
+    }
+
+    public static Result HARD(Activity activity) {
+        Result result = new Result(activity);
+        result.setHeight(30);
+        result.setWidth(16);
+        result.setMineCount(99);
+        result.setDifficulty_description("困难");
+        return result;
     }
 
     public int getHeight() {

@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.views;
+package org.goldfish.minesweeper_android_01.activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -40,8 +40,7 @@ public class EntranceActivity extends AppCompatActivity implements Resources {
     protected void onResume() {
         super.onResume();
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-//        transaction.add(R.id.nav_host_fragment_container, CustomModeFragment.class, savedInstanceState);
-        transaction.add(R.id.nav_host_fragment_container, ModeSelectFragment.class, savedInstanceState);
+        transaction.replace(R.id.nav_host_fragment_container, ModeSelectFragment.class, savedInstanceState);
         transaction.addToBackStack(null);
         int result = transaction.commit();
         Log.i(TAG, "onResume: " + result);

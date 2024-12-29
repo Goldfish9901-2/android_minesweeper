@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 
-import org.goldfish.minesweeper_android_01.views.GameActivity;
+import org.goldfish.minesweeper_android_01.activities.GameActivity;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.Resources;
 

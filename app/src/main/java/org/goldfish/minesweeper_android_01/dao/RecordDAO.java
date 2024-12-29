@@ -16,7 +16,7 @@ public interface RecordDAO {
     @Query("SELECT * FROM Result")
     List<Result> getAll();
 
-    @Query("SELECT * FROM Result WHERE win = true")
+    @Query("SELECT * FROM Result WHERE win = 1")
     List<Result> getWinRecords();
 
     @Delete(entity = Result.class)
