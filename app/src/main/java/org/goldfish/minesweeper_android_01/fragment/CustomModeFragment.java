@@ -26,7 +26,8 @@ import org.goldfish.minesweeper_android_01.entity.Result;
  * 3. Set up the start button<br/>
  */
 public class CustomModeFragment extends AbstractEntranceFragment {
-    View.OnClickListener blankChoiceListener;
+    View.OnClickListener giveUpListener;
+    View.OnClickListener emptyChoiceListener;
 
     public CustomModeFragment() {
         // Required empty public constructor
@@ -35,12 +36,17 @@ public class CustomModeFragment extends AbstractEntranceFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        blankChoiceListener = v -> {
+        giveUpListener = v -> {
             FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.nav_host_fragment_container, ModeSelectFragment.class, savedInstanceState);
             transaction.addToBackStack(null);
             transaction.commit();
         };
+        emptyChoiceListener = v -> Toast.makeText(
+                requireContext(),
+                "请先选择高度、宽度和雷数",
+                Toast.LENGTH_SHORT
+        ).show();
 
     }
 
@@ -52,7 +58,6 @@ public class CustomModeFragment extends AbstractEntranceFragment {
 
         Spinner heightSpinner = viewToInflate.findViewById(R.id.height_spinner);
         Spinner widthSpinner = viewToInflate.findViewById(R.id.width_spinner);
-        Spinner minesSpinner = viewToInflate.findViewById(R.id.count_spinner);
 
         heightSpinner.setAdapter(getHeightAdapter());
         widthSpinner.setAdapter(getWidthAdapter());
@@ -62,10 +67,9 @@ public class CustomModeFragment extends AbstractEntranceFragment {
         heightSpinner.setOnItemSelectedListener(listener);
         widthSpinner.setOnItemSelectedListener(listener);
         viewToInflate.findViewById(R.id.custom_start_button)
-                .setOnClickListener(v ->
-                        Toast.makeText(requireContext(), "请先选择高度、宽度和雷数", Toast.LENGTH_SHORT).show());
+                .setOnClickListener(emptyChoiceListener);
         viewToInflate.findViewById(R.id.custom_out_button)
-                .setOnClickListener(blankChoiceListener);
+                .setOnClickListener(giveUpListener);
         return viewToInflate;
     }
 
@@ -79,27 +83,41 @@ public class CustomModeFragment extends AbstractEntranceFragment {
     private AdapterView.OnItemSelectedListener getAfterSizeSelectedListener(View inflatedView) {
 
         return new AdapterView.OnItemSelectedListener() {
+            boolean heightSelected = false;
+            boolean widthSelected = false;
+            final Spinner minesSpinner = inflatedView.findViewById(R.id.count_spinner);
+
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Spinner minesSpinner = inflatedView.findViewById(R.id.count_spinner);
+                if (parent.getId() == R.id.height_spinner) {
+                    heightSelected = true;
+                } else if (parent.getId() == R.id.width_spinner) {
+                    widthSelected = true;
+                }
+                if (!heightSelected || !widthSelected) {
+                    return;
+                }
                 Spinner heightSpinner = inflatedView.findViewById(R.id.height_spinner);
                 Spinner widthSpinner = inflatedView.findViewById(R.id.width_spinner);
                 int height = (int) heightSpinner.getSelectedItem();
                 int width = (int) widthSpinner.getSelectedItem();
                 minesSpinner.setAdapter(getMinesAdapter(height, width));
-                minesSpinner.setOnItemSelectedListener(getRefreshedOnCountSelectedListener(inflatedView));
+                minesSpinner.setOnItemSelectedListener(getMineCountSelectedListener(inflatedView));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
+                heightSelected = false;
+                widthSelected = false;
+                minesSpinner.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item));
                 Button startButton = inflatedView.findViewById(R.id.custom_start_button);
-                startButton.setOnClickListener(blankChoiceListener);
+                startButton.setOnClickListener(giveUpListener);
             }
         };
     }
 
     @NonNull
-    private AdapterView.OnItemSelectedListener getRefreshedOnCountSelectedListener(View inflatedView) {
+    private AdapterView.OnItemSelectedListener getMineCountSelectedListener(View inflatedView) {
         Spinner minesSpinner = inflatedView.findViewById(R.id.count_spinner);
         Spinner heightSpinner = inflatedView.findViewById(R.id.height_spinner);
         Spinner widthSpinner = inflatedView.findViewById(R.id.width_spinner);
@@ -114,7 +132,7 @@ public class CustomModeFragment extends AbstractEntranceFragment {
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
                 Button startButton = inflatedView.findViewById(R.id.custom_start_button);
-                startButton.setOnClickListener(blankChoiceListener);
+                startButton.setOnClickListener(giveUpListener);
             }
         };
     }
@@ -143,7 +161,7 @@ public class CustomModeFragment extends AbstractEntranceFragment {
     private ArrayAdapter<Integer> getMinesAdapter(int height, int width) {
         ArrayAdapter<Integer> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        int count_min = (int) (Math.sqrt(height * width) );
+        int count_min = (int) (Math.sqrt(height * width));
         int count_max = height * width / 4;
         for (int i = count_min; i <= count_max; i++) {
             adapter.add(i);

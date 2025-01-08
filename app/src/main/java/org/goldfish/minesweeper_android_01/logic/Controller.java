@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
 import org.goldfish.minesweeper_android_01.activities.GameActivity;
+import org.goldfish.minesweeper_android_01.entity.Result;
 
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -33,6 +34,13 @@ public class Controller {
     Chronometer chronometer;
     private int used;
     private boolean finished;
+    private Result result;
+
+    public Controller(Result result) {
+
+        this(result.getHeight(), result.getWidth(), result.getMineCount(), result.getDifficultyDescription());
+        this.result = result;
+    }
 
     /**
      * 构造函数
@@ -41,6 +49,7 @@ public class Controller {
      * @param width  雷区的宽度
      * @param mines  雷区的雷数
      */
+
 
     public Controller(int height, int width, int mines, String difficulty_description) {
         this.height = height;
@@ -232,6 +241,7 @@ public class Controller {
         }
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
+        result.start();
 
     }
 
@@ -331,7 +341,7 @@ public class Controller {
             System.out.println(activity.getController());
         }
         if (isFinished()) {
-            checkFinished();
+            win();
         }
     }
 
@@ -380,7 +390,7 @@ public class Controller {
     /**
      * 检查游戏是否结束
      */
-    private void checkFinished() {
+    private void win() {
         this.finished = true;
         getFinishDialog(true).show();
     }
@@ -428,6 +438,7 @@ public class Controller {
 
     public AlertDialog getFinishDialog(boolean win) {
         finished = true;
+        result.end();
         for (Grid[] row : grids) {
             for (Grid g : row) {
                 g.setOnClickListener(null);
@@ -436,8 +447,10 @@ public class Controller {
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         String title = win ? "您赢了" : "您输了";
+
         chronometer.stop();
-        long timeUsed = SystemClock.elapsedRealtime() - chronometer.getBase();
+        result.end();
+        long timeUsed = result.getInterval();
         timeUsed /= 1000;
         String content = "用时：" + timeUsed + "秒";
 

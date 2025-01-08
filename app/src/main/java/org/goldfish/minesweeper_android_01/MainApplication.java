@@ -21,6 +21,7 @@ public class MainApplication extends Application {
         instance = this;
         RecordDatabase database = Room.databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
                 .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
                 .build();
         dao = database.dao();
         super.onCreate();

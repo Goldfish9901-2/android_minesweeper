@@ -157,7 +157,7 @@ public class Result extends Intent implements ResultFieldNames{
         GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID);
         long endStamp = endTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
         long startStamp = startTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
-        interval = endStamp - startStamp;
+        setInterval(endStamp - startStamp);
     }
 
     public int getEndTimeID() {

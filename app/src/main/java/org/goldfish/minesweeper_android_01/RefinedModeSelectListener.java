@@ -25,6 +25,7 @@ public class RefinedModeSelectListener implements View.OnClickListener, ResultFi
         result.putExtra(HEIGHT, result.getHeight());
         result.putExtra(WIDTH, result.getWidth());
         result.putExtra(MINE_COUNT, result.getMineCount());
+        result.putExtra(DIFFICULTY_DESCRIPTION, result.getDifficultyDescription());
         builder.setTitle("确认你的难度");
         builder.setMessage("模式:" + result.getDifficultyDescription() + "\n" +
                 "雷区高度: " + result.getHeight() + "\n" +

@@ -17,6 +17,7 @@ import org.goldfish.minesweeper_android_01.logic.Controller;
 import org.goldfish.minesweeper_android_01.logic.Grid;
 
 import java.util.Locale;
+import java.util.Objects;
 
 public class GameActivity extends AppCompatActivity implements ResultFieldNames {
 
@@ -35,15 +36,29 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
 
         Intent intent = getIntent();
         GridLayout layout;
-        if (intent instanceof Result) {
-            mode = (Result) intent;
-        }
-        int height = intent.getIntExtra(HEIGHT, 10);
-        int width = intent.getIntExtra(WIDTH, 10);
-        int mines = intent.getIntExtra(MINE_COUNT, 10);
-        String difficulty_description = intent.getStringExtra("difficulty_description");
 
-        controller = new Controller(height, width, mines, difficulty_description);
+        int height = intent.getIntExtra(HEIGHT, 0);
+        int width = intent.getIntExtra(WIDTH, 0);
+        int mines = intent.getIntExtra(MINE_COUNT, 0);
+        if(height == 0 || width == 0 || mines == 0) {
+            Toast.makeText(this, "无法获取难度信息", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+        String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
+
+        try {
+            mode = (Result) intent;
+            Objects.requireNonNull(mode);
+        }catch (RuntimeException exception) {
+            mode = new Result();
+            mode.setHeight(height);
+            mode.setWidth(width);
+            mode.setMineCount(mines);
+            mode.setDifficulty_description(difficulty_description);
+        }
+
+        controller = new Controller(mode);
         controller.setActivity(this);
 
         Toast.makeText(this, String.format(Locale.CHINA, "模式: %s 高度: %d, 宽度: %d, 雷数: %d", difficulty_description, height, width, mines), Toast.LENGTH_SHORT).show();
@@ -55,7 +70,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
             chronometer.setBase(0);
             controller.setChronometer(chronometer);
 
-            minePrompt=findViewById(R.id.mine_counter);
+            minePrompt = findViewById(R.id.mine_counter);
             minePrompt.setText(String.valueOf(mines));
 
             layout = findViewById(R.id.grids_field);
