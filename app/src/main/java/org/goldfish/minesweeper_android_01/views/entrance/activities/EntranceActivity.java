@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.activities;
+package org.goldfish.minesweeper_android_01.views.entrance.activities;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -11,11 +11,13 @@ import androidx.fragment.app.FragmentTransaction;
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.Resources;
-import org.goldfish.minesweeper_android_01.fragment.CustomModeFragment;
-import org.goldfish.minesweeper_android_01.fragment.ModeSelectFragment;
+import org.goldfish.minesweeper_android_01.views.entrance.fragments.CustomModeFragment;
+import org.goldfish.minesweeper_android_01.views.entrance.fragments.ModeSelectFragment;
 
 
-public class EntranceActivity extends AppCompatActivity implements Resources {
+public class EntranceActivity
+        extends AppCompatActivity
+        implements Resources {
     String TAG = MainApplication.TAG;
     FragmentContainerView fragmentContainerView;
     CustomModeFragment customModeFragment;

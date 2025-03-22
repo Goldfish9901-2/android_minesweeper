@@ -1,19 +1,29 @@
 package org.goldfish.minesweeper_android_01.logic;
 //Grid.java
 
+import static android.widget.Toast.LENGTH_SHORT;
+
+import android.annotation.SuppressLint;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 
-import org.goldfish.minesweeper_android_01.activities.GameActivity;
+import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.Resources;
+import org.goldfish.minesweeper_android_01.VibrationTypes;
+import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,21 +31,21 @@ import java.util.Set;
 /**
  * {@code Grid} 游戏的基本单位 <br/>
  * 用于表示游戏中的一个格子
- *
  */
-public class Grid extends AppCompatImageButton {
+@SuppressLint("ViewConstructor")
+public class Grid extends AppCompatImageButton implements VibrationTypes {
     //info for controller only
     private final int row;
+
+    private Drawable icon = null;
     private final int col;
     private final Set<Grid> neighbors;
     private final Integer[] surroundingMinesResourceIDs;
+    private final int SIZE = 100;
     public GameActivity activity;
-
-
     private STATE state;
     private boolean mine;
     private int surroundingMines;
-    private final int SIZE=100;
 
     public Grid(GameActivity activity, int row, int col) {
         super(activity);
@@ -57,8 +67,17 @@ public class Grid extends AppCompatImageButton {
 
         setAdjustViewBounds(true);
 
-        setOnClickListener(v -> this.activity.getController().generateMine(this));
-        updateState();
+        setOnClickListener(v -> {
+            try {
+                this.activity.getController().generateMine(this);
+            } catch (MineTriggeredException e) {
+                Log.w("Controller:generateMine", "MineTriggeredException");
+                Toast.makeText(activity, "内部错误0x0001", LENGTH_SHORT).show();
+                activity.finish();
+            }
+        });
+//        updateState();
+        activity.submitGridOpenAnimation(this);
 
     }
 
@@ -82,7 +101,7 @@ public class Grid extends AppCompatImageButton {
         if (mine) return false;
         mine = true;
         surroundingMines = -1;
-        updateState();
+//        updateState();
         return true;
     }
 
@@ -114,10 +133,12 @@ public class Grid extends AppCompatImageButton {
         Log.d("open", toString());
         state = STATE.OPEN;
         activity.getController().addFinished(this);
-        updateState();
+//        updateState();
+        activity.submitGridOpenAnimation(this);
     }
 
     public boolean flag() {
+        MainApplication.vibrate(CLICK);
         if (state == STATE.OPEN)
             return false;
         switch (state) {
@@ -129,29 +150,36 @@ public class Grid extends AppCompatImageButton {
                 break;
         }
         activity.getController().updateProgress();
-        updateState();
+        activity.submitGridOpenAnimation(this);
         return true;
     }
 
     @NonNull
     @Override
     public String toString() {
-        char state = '-';
+        char state;
         char mine;
         if (this.mine) {
             mine = '#';
         } else {
             mine = (char) ('0' + surroundingMines);
         }
-        switch (this.state) {
-            case CLOSE:
-                state = '-';
-            case FLAG:
-                state = '>';
-            case OPEN:
-                state = '+';
-        }
+        state = switch (this.state) {
+            case CLOSE -> '-';
+            case FLAG -> '>';
+            case OPEN -> '+';
+        };
         return "" + mine + state;
+    }
+
+    @Override
+    public void setImageDrawable(@Nullable Drawable drawable) {
+        super.setImageDrawable(drawable);
+        this.icon = drawable;
+    }
+
+    public Drawable getIcon() {
+        return icon;
     }
 
     public void countSurroundings() {
@@ -165,7 +193,7 @@ public class Grid extends AppCompatImageButton {
         return surroundingMines;
     }
 
-    public void updateState() {
+    public void updateDisplay() {
         switch (state) {
             case FLAG:
                 setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.flag));
@@ -177,15 +205,16 @@ public class Grid extends AppCompatImageButton {
                 setBackgroundColor(Color.GRAY);
                 return;
         }
+        // now left opened grids
         setBackgroundColor(Color.CYAN);
-        do {
-            if (mine) {
-                setImageResource(R.drawable.exploded);
-                return;
-            }
-            if (surroundingMines == 0) return;
-        } while (false);
+        if (mine) {
+            // this only happens when the game is over
+            setImageResource(R.drawable.exploded);
+            return;
+        }
+        if (surroundingMines == 0) return;
 
+        // now left opened grids with surrounding mines
         setImageDrawable(ContextCompat.getDrawable(activity, surroundingMinesResourceIDs[surroundingMines]));
         Log.v("Grid::updateState", "Setting image resource to ImageButton.");
         setBackgroundColor(Color.TRANSPARENT);
@@ -195,26 +224,26 @@ public class Grid extends AppCompatImageButton {
         params.setMargins(0, 0, 0, 0);
         setLayoutParams(params);
         setPadding(0, 0, 0, 0);
-
     }
 
     public void prepared() {
         setOnLongClickListener((v) -> flag());
         setOnClickListener(new ClickListener());
+        setLongClickable(true);
+
     }
 
     public enum STATE {
         CLOSE, FLAG, OPEN
     }
 
-
     private class ClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
+            MainApplication.vibrate(TICK);
             try {
                 activity.getController().open(Grid.this, state == STATE.OPEN);
-                activity.getController().updateState();
-            }catch (MineTriggeredException e){
+            } catch (MineTriggeredException e) {
                 activity.getController().Lose();
             }
         }

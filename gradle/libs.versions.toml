@@ -1,5 +1,5 @@
 [versions]
-agp = "8.6.1"
+agp = "8.9.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
@@ -13,6 +13,7 @@ roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 roomKtx = "2.6.1"
 roomVersion = "2.6.1"
+monitor = "1.7.2"
 
 [libraries]
 androidx-room-guava = { module = "androidx.room:room-guava", version.ref = "roomRuntime" }
@@ -32,6 +33,7 @@ room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomCompiler" }
 room-paging = { module = "androidx.room:room-paging", version.ref = "roomVersion" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "roomRuntime" }
+androidx-monitor = { group = "androidx.test", name = "monitor", version.ref = "monitor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

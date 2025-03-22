@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.fragment;
+package org.goldfish.minesweeper_android_01.views.entrance.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,9 +12,10 @@ import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.RefinedModeSelectListener;
-import org.goldfish.minesweeper_android_01.entity.Result;
-import org.goldfish.minesweeper_android_01.activities.EntranceActivity;
-import org.goldfish.minesweeper_android_01.activities.RecordActivity;
+import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.views.entrance.activities.EntranceActivity;
+import org.goldfish.minesweeper_android_01.views.record.RecordActivity;
+import org.goldfish.minesweeper_android_01.views.AbstractEntranceFragment;
 
 /**
  * A simple {@link Fragment} subclass.

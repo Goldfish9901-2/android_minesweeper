@@ -1,5 +1,9 @@
 package org.goldfish.minesweeper_android_01.logic;
 
+import static android.widget.Toast.LENGTH_SHORT;
+
+import static java.lang.Thread.sleep;
+
 import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
@@ -9,14 +13,19 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 
-import org.goldfish.minesweeper_android_01.activities.GameActivity;
-import org.goldfish.minesweeper_android_01.entity.Result;
+import org.goldfish.minesweeper_android_01.MainApplication;
+import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
+import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 /**
  * 控制器<br/>
@@ -29,6 +38,10 @@ public class Controller {
 
     private final int height, width, mines;
     Grid[][] grids;
+    /**
+     * Set of finished grids<br/>
+     * its size ( i.e. {@link Collection#size()}) is used to determine if the game is finished
+     */
     Set<Grid> finishedGrids;
     GameActivity activity;
     Chronometer chronometer;
@@ -62,7 +75,7 @@ public class Controller {
     }
 
     public static void promptAndExit(Context activity) {
-        Toast.makeText(activity, "下次扫雷再见！", Toast.LENGTH_SHORT).show();
+        Toast.makeText(activity, "下次扫雷再见！", LENGTH_SHORT).show();
         System.exit(0);
     }
 
@@ -131,9 +144,8 @@ public class Controller {
                 if (grid.addNeighbor(gridCandidate)) continue;
 
                 //添加邻居不成功 则执行以下处理
-                if (activity == null)
-                    throw new NullPointerException("Call SetActivity first");
-                Toast.makeText(activity, "邻接错误", Toast.LENGTH_SHORT).show();
+                if (activity == null) throw new NullPointerException("Call SetActivity first");
+                Toast.makeText(activity, "邻接错误", LENGTH_SHORT).show();
                 return true;
             }
         }
@@ -172,13 +184,9 @@ public class Controller {
      *
      * @param chronometer 计时器
      */
-    public void setChronometer(Chronometer chronometer) {
-        this.chronometer = chronometer;
-        if (chronometer == null) {
-            Log.w(thrower, "setChronometer: ", new NullPointerException());
-            return;
-        }
-        chronometer.setBase(SystemClock.elapsedRealtime());
+    public void setChronometer(@NonNull Chronometer chronometer)
+            throws NullPointerException {
+        this.chronometer = Objects.requireNonNull(chronometer);
     }
 
     /**
@@ -187,8 +195,9 @@ public class Controller {
      * @param start 用户选中的格子 此格及周围不得为雷
      */
 
-    public void generateMine(Grid start) {
-        Log.i("Controller:generateMine", "generateMine: " + "<" + start.getRow() + '-' + start.getCol() + '>');
+    public void generateMine(Grid start) throws MineTriggeredException {
+        Log.i("Controller:generateMine",
+                "generateMine: " + "<" + start.getRow() + '-' + start.getCol() + '>');
         Set<Grid> invalidGrids = new LinkedHashSet<>();
         invalidGrids.add(start);
         invalidGrids.addAll(start.getNeighbors());
@@ -229,14 +238,11 @@ public class Controller {
             Log.v("Controller:generateMine", "UPDATE");
             getGrid(index).countSurroundings();
         }
+        open(start);
 
-        try {
-            open(start);
-        } catch (MineTriggeredException e) {
-            Log.w("Controller:generateMine", "MineTriggeredException");
-        }
         for (int index = 0; index < width * height; index++) {
-            getGrid(index).updateState();
+//            getGrid(index).updateState();
+//            activity.submitGridOpenAnimation(getGrid(index));
             getGrid(index).prepared();
         }
         chronometer.setBase(SystemClock.elapsedRealtime());
@@ -262,8 +268,8 @@ public class Controller {
     }
 
     /**
-     * 打开格子
-     * 默认游戏没有开始
+     * 打开格子</br>
+     * 默认游戏<strong>没有开始</strong>
      *
      * @param start 起始格子
      * @throws MineTriggeredException 触雷
@@ -289,34 +295,38 @@ public class Controller {
     public void open(Grid start, boolean started) throws MineTriggeredException {
         Queue<Grid> queue = new LinkedList<>();
         boolean[][] visited = new boolean[height][width];
+        final boolean[] refreshActivity = {true};
         if (finished) {
-            Toast.makeText(activity, "游戏已结束", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, "游戏已结束", LENGTH_SHORT).show();
             return;
         }
         if (started) {
-            if (start.getState() == Grid.STATE.FLAG) return;
-            int flagCount = 0;
-            for (Grid n : start.getNeighbors()) {
-                switch (n.getState()) {
-                    case FLAG:
-                        flagCount++;
-                    case OPEN:
-                        continue;
-                    default:
-                        break;
+            // if the grid the player clicked is flagged,
+            // add security check to prevent opening
+            if (start.getState() == Grid.STATE.FLAG) {
+                Toast.makeText(activity, "🚩", LENGTH_SHORT).show();
+                return;
+            }
+            AtomicInteger flagCount = new AtomicInteger();
+            Stream<Grid> notOpened = start.getNeighbors().stream().filter(
+                    grid -> !(grid.getState() == Grid.STATE.OPEN)
+            );
+            notOpened.forEach(n -> {
+                if (Objects.requireNonNull(n.getState()) == Grid.STATE.FLAG) {
+                    flagCount.getAndIncrement();
                 }
                 queue.add(n);
-            }
-            int remaining = start.getSurroundingMines() - flagCount;
+            });
+            int remaining = start.getSurroundingMines() - flagCount.get();
             String message;
             if (remaining > 0) {
                 message = String.format(Locale.CHINA, "少插了%d个旗子", remaining);
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, message, LENGTH_SHORT).show();
                 return;
             }
             if (remaining < 0) {
                 message = String.format(Locale.CHINA, "多插了%d个旗子", -remaining);
-                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, message, LENGTH_SHORT).show();
                 return;
             }
         } else {
@@ -330,14 +340,20 @@ public class Controller {
             }
             current.open();
 
+
             visited[current.getRow()][current.getCol()] = true;
             if (current.getSurroundingMines() != 0) continue;
+            Stream<Grid> openCandidates = current.getNeighbors().stream().filter(
+                    grid -> !visited[grid.getRow()][grid.getCol()]
+            );
+            openCandidates.forEach(grid -> {
+                queue.add(grid);
+                activity.submitGridOpenAnimation(grid, refreshActivity[0]);
+                refreshActivity[0] = false;
+//                visited[grid.getRow()][grid.getCol()] = true;
+            });
 
-            for (Grid potentials : current.getNeighbors()) {
-                if (visited[potentials.getRow()][potentials.getCol()]) continue;
-                queue.add(potentials);
-            }
-            //在日志中输出雷区信息
+            // 在日志中输出雷区信息
             System.out.println(activity.getController());
         }
         if (isFinished()) {
@@ -404,23 +420,26 @@ public class Controller {
         getFinishDialog(false).show();
     }
 
-    public void updateState() {
-        for (Grid[] row : grids) {
-            for (Grid g : row)
-                g.updateState();
-        }
-    }
+//    public void updateState() {
+//        for (Grid[] row : grids) {
+////            for (Grid g : row)
+////                g.updateState();
+//        }
+//    }
 
     /**
      * 显示所有格子 告诉用户输掉的原因
      */
 
     public void reveal() {
+        boolean refreshActivity = true;
         for (Grid[] row : grids) {
             for (Grid g : row) {
                 try {
                     g.open(true);
-                    g.updateState();
+                    activity.submitGridOpenAnimation(g, refreshActivity);
+                    refreshActivity = false;
+//                    g.updateState();
                 } catch (MineTriggeredException exception) {
                     Log.w("Controller:reveal", "MineTriggeredException");
                 }
@@ -438,7 +457,6 @@ public class Controller {
 
     public AlertDialog getFinishDialog(boolean win) {
         finished = true;
-        result.end();
         for (Grid[] row : grids) {
             for (Grid g : row) {
                 g.setOnClickListener(null);
@@ -448,12 +466,10 @@ public class Controller {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         String title = win ? "您赢了" : "您输了";
 
-        chronometer.stop();
-        result.end();
-        long timeUsed = result.getInterval();
-        timeUsed /= 1000;
-        String content = "用时：" + timeUsed + "秒";
+        String content = getEndMessage(win);
 
+        result.setWin(win);
+        MainApplication.getInstance().getDao().recordGame(result);
 
         builder.setTitle(title);
         builder.setMessage(content);
@@ -463,6 +479,15 @@ public class Controller {
         });
 
         return builder.create();
+    }
+
+    private @NonNull String getEndMessage(boolean win) {
+        chronometer.stop();
+        result.end();
+        result.setWin(win);
+        long timeUsed = result.getInterval();
+//        timeUsed /= 1000;
+        return "用时：" + timeUsed + "秒";
     }
 }
 

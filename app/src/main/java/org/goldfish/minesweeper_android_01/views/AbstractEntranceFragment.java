@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.fragment;
+package org.goldfish.minesweeper_android_01.views;
 
 import android.view.View;
 import android.widget.Toast;
@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 
-abstract class AbstractEntranceFragment extends Fragment {
+public abstract class AbstractEntranceFragment extends Fragment {
     @NonNull
     protected static AlertDialog.Builder getRestoreAlertBuilder(View view) {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());

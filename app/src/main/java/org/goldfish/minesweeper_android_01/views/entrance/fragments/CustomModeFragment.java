@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.fragment;
+package org.goldfish.minesweeper_android_01.views.entrance.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,7 +16,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.RefinedModeSelectListener;
-import org.goldfish.minesweeper_android_01.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.views.AbstractEntranceFragment;
 
 /**
  * A simple {@link Fragment} subclass.

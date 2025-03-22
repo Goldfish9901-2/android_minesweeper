@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "org.goldfish.minesweeper_android_01"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "org.goldfish.minesweeper_android_01"
-        minSdk = 28
-        targetSdk = 34
+        minSdk = 29
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -46,13 +46,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 }
-dependencies{
-    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
-    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
-    implementation(files("src/main/libs/AMap3DMap_10.0.900_AMapSearch_9.7.3_AMapLocation_6.4.7_20240816.jar"))
-}
 dependencies {
 
+    implementation(libs.androidx.monitor)
     implementation(libs.room.runtime)
 
 //    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)

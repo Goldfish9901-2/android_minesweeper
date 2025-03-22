@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.entity;
+package org.goldfish.minesweeper_android_01.persistance.entity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
-import org.goldfish.minesweeper_android_01.activities.GameActivity;
+import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
 import java.time.ZoneOffset;
 
@@ -51,7 +51,7 @@ public class Result extends Intent implements ResultFieldNames{
     /**
      * 开始时间
      * 指向{@link GFTime}数据库表中的记录
-     * @see org.goldfish.minesweeper_android_01.entity.GFTime
+     * @see GFTime
      */
     int startTimeID;
     /**
@@ -141,20 +141,16 @@ public class Result extends Intent implements ResultFieldNames{
     }
 
     public void start() {
-        GFTime startTime = new GFTime();
+        GFTime startTime = new GFTime(GFTime.TIME_SOURCE.FROM_SYSTEM);
         MainApplication.getInstance().getDao().insertTime(startTime);
         this.startTimeID = MainApplication.getInstance().getDao().getTimeId(startTime).get(0);
     }
 
-    public GFTime getStartTime() {
-        return MainApplication.getInstance().getDao().getTimeById(startTimeID);
-    }
-
     public void end() {
-        GFTime endTime = new GFTime();
+        GFTime endTime = new GFTime(GFTime.TIME_SOURCE.FROM_SYSTEM);
         MainApplication.getInstance().getDao().insertTime(endTime);
         this.endTimeID = MainApplication.getInstance().getDao().getTimeId(endTime).get(0);
-        GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID);
+        GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID,true);
         long endStamp = endTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
         long startStamp = startTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
         setInterval(endStamp - startStamp);

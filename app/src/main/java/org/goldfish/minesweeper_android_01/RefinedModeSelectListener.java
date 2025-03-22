@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.view.View;
 
 import androidx.appcompat.app.AlertDialog;
-import org.goldfish.minesweeper_android_01.entity.Result;
-import org.goldfish.minesweeper_android_01.entity.ResultFieldNames;
+import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.ResultFieldNames;
 
 public class RefinedModeSelectListener implements View.OnClickListener, ResultFieldNames {
     private final Result result;

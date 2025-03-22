@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.entity;
+package org.goldfish.minesweeper_android_01.persistance.entity;
 
 import org.goldfish.minesweeper_android_01.Resources;
 

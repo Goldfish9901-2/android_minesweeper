@@ -5,17 +5,21 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.RecordActivity">
+    tools:context=".views.record.RecordActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:id="@+id/rec_activity_wrapper"
+        >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="100sp"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:id="@+id/rec_activity_nav"
+            >
 
 
             <Space
@@ -38,7 +42,8 @@
         </LinearLayout>
         <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            >
             <TableLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
