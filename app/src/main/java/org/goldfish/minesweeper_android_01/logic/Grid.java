@@ -33,7 +33,8 @@ import java.util.Set;
  * 用于表示游戏中的一个格子
  */
 @SuppressLint("ViewConstructor")
-public class Grid extends AppCompatImageButton implements VibrationTypes {
+public class Grid extends AppCompatImageButton
+        implements VibrationTypes, Comparable<Grid> {
     //info for controller only
     private final int row;
 
@@ -231,6 +232,15 @@ public class Grid extends AppCompatImageButton implements VibrationTypes {
         setOnClickListener(new ClickListener());
         setLongClickable(true);
 
+    }
+
+    @Override
+    public int compareTo(Grid o) {
+        int size = activity.getController().getResult().getHeight();
+        return Integer.compare(
+                o.getCol() + o.getRow() * size,
+                getCol() + getRow() * size
+        );
     }
 
     public enum STATE {

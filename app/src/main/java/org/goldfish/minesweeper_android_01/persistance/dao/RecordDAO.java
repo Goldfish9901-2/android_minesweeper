@@ -5,6 +5,7 @@ import android.util.Log;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.persistance.entity.GFTime;
@@ -20,8 +21,6 @@ public interface RecordDAO {
     @Query("SELECT * FROM Result WHERE win = 1")
     List<Result> getWinRecords();
 
-//    @Delete(entity = Result.class)
-//    void delete(Result result);
 
     @Query("DELETE FROM Result")
     void deleteAll();

@@ -2,6 +2,7 @@ package org.goldfish.minesweeper_android_01.persistance.entity;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
@@ -17,7 +18,7 @@ import java.time.ZoneOffset;
  * {@code Result} 游戏结果信息 <br/>
  */
 @Entity
-public class Result extends Intent implements ResultFieldNames{
+public class Result extends Intent implements ResultFieldNames {
 
     /**
      * 数据库存储字段
@@ -46,16 +47,17 @@ public class Result extends Intent implements ResultFieldNames{
      */
     @Nullable
     Boolean win;
-    @Ignore
     long interval;
     /**
      * 开始时间
      * 指向{@link GFTime}数据库表中的记录
+     *
      * @see GFTime
      */
     int startTimeID;
     /**
      * 结束时间
+     *
      * @see #startTimeID
      */
     int endTimeID;
@@ -150,10 +152,11 @@ public class Result extends Intent implements ResultFieldNames{
         GFTime endTime = new GFTime(GFTime.TIME_SOURCE.FROM_SYSTEM);
         MainApplication.getInstance().getDao().insertTime(endTime);
         this.endTimeID = MainApplication.getInstance().getDao().getTimeId(endTime).get(0);
-        GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID,true);
+        GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID, true);
         long endStamp = endTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
         long startStamp = startTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
         setInterval(endStamp - startStamp);
+        Log.w(MainApplication.TAG, MainApplication.getInstance().getDao().getAll().toString());
     }
 
     public int getEndTimeID() {
@@ -194,5 +197,21 @@ public class Result extends Intent implements ResultFieldNames{
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return "Result{" +
+                "\n\t win=" + win +
+                "\n\t interval=" + interval +
+                "\n\t startTimeID=" + startTimeID +
+                "\n\t endTimeID=" + endTimeID +
+                "\n\t id=" + id +
+                "\n\t height=" + height +
+                "\n\t width=" + width +
+                "\n\t mineCount=" + mineCount +
+                "\n\t difficulty_description='" + difficulty_description + '\'' +
+
+                '}';
     }
 }

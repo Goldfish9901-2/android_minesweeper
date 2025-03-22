@@ -47,6 +47,11 @@ public class Controller {
     Chronometer chronometer;
     private int used;
     private boolean finished;
+
+    public Result getResult() {
+        return result;
+    }
+
     private Result result;
 
     public Controller(Result result) {
@@ -381,7 +386,7 @@ public class Controller {
     }
 
     /**
-     * 计算插旗数 给{@code updateProgress()}调用<br/>
+     * 计算插旗数 给{@link Controller#updateProgress()}调用<br/>
      *
      * @return 插旗数
      */
@@ -398,7 +403,6 @@ public class Controller {
     /**
      * 数总共插旗数 给用户提示游戏进度
      */
-
     public void updateProgress() {
         activity.getMinePrompt().setText(String.valueOf(mines - countFlagTotal()));
     }
@@ -407,7 +411,7 @@ public class Controller {
      * 检查游戏是否结束
      */
     private void win() {
-        this.finished = true;
+        endGame(true);
         getFinishDialog(true).show();
     }
 
@@ -415,17 +419,19 @@ public class Controller {
      * 输掉游戏
      */
     public void Lose() {
-        this.finished = true;
+        endGame(false);
         reveal();
         getFinishDialog(false).show();
     }
 
-//    public void updateState() {
-//        for (Grid[] row : grids) {
-////            for (Grid g : row)
-////                g.updateState();
-//        }
-//    }
+    private void endGame(boolean win) {
+        finished = true;
+        chronometer.stop();
+        result.end();
+        result.setWin(win);
+        if (win)
+            MainApplication.getInstance().getDao().recordGame(result);
+    }
 
     /**
      * 显示所有格子 告诉用户输掉的原因
@@ -439,7 +445,6 @@ public class Controller {
                     g.open(true);
                     activity.submitGridOpenAnimation(g, refreshActivity);
                     refreshActivity = false;
-//                    g.updateState();
                 } catch (MineTriggeredException exception) {
                     Log.w("Controller:reveal", "MineTriggeredException");
                 }
@@ -468,9 +473,6 @@ public class Controller {
 
         String content = getEndMessage(win);
 
-        result.setWin(win);
-        MainApplication.getInstance().getDao().recordGame(result);
-
         builder.setTitle(title);
         builder.setMessage(content);
 
@@ -482,12 +484,8 @@ public class Controller {
     }
 
     private @NonNull String getEndMessage(boolean win) {
-        chronometer.stop();
-        result.end();
-        result.setWin(win);
         long timeUsed = result.getInterval();
-//        timeUsed /= 1000;
-        return "用时：" + timeUsed + "秒";
+        return win ? "用时：" + timeUsed + "秒" : "";
     }
 }
 

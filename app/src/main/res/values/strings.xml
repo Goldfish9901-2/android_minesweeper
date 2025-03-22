@@ -34,5 +34,8 @@
     <string name="custom_start_button_label">开始</string>
     <string name="custom_out">返回</string>
     <string name="record_summary">成就概要</string>
+    <string name="elapsed_time">用时</string>
+    <string name="start_time">开始时间</string>
+    <string name="end_time">结束时间</string>
 
 </resources>

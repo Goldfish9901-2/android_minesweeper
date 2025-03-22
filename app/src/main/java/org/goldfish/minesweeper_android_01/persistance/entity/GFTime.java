@@ -133,12 +133,11 @@ public class GFTime implements Comparable<GFTime> {
     @NonNull
     @Override
     public String toString() {
-        String stringBuffer = month + "/" +
+        return month + "/" +
                 day + "-" +
                 hour + ":" +
                 minute + ":" +
                 second;
-        return stringBuffer;
     }
 
 

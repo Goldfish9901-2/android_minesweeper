@@ -21,6 +21,7 @@ import java.util.List;
 public class RecordActivity extends AppCompatActivity {
     final static float TEXT_SIZE = 30;
     TableLayout tableLayout;
+    TableLayout detailLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,20 +35,19 @@ public class RecordActivity extends AppCompatActivity {
         });
         List<Result> records = MainApplication.getInstance().getDao().getWinRecords();
         tableLayout = findViewById(R.id.record_table);
-        new RecordView(records);
+        detailLayout=findViewById(R.id.record_detail_table);
+        for (Result record : records) {
+            RecordRow row = new RecordRow(record);
+            tableLayout.addView(row);
+            DetailedRecordRow detailedRow=new DetailedRecordRow(record);
+            detailLayout.addView(detailedRow);
+        }
 
-        Button backButton = findViewById(R.id.recoord_return_button);
+        Button backButton = findViewById(R.id.record_return_button);
         backButton.setOnClickListener(v -> finish());
     }
 
-    class RecordView {
-        public RecordView(List<Result> records) {
-            for (Result record : records) {
-                RecordRow row = new RecordRow(record);
-                tableLayout.addView(row);
-            }
-        }
-    }
+
 
     class RecordRow extends TableRow {
         /**
@@ -72,8 +72,33 @@ public class RecordActivity extends AppCompatActivity {
             addView(fieldSizeCell);
             addView(minesCell);
             addView(timeCell);
+//            addView(new DetailedRecordCell(startTime));
+//            addView(new DetailedRecordCell(endTime));
 
 
+        }
+    }
+
+    class DetailedRecordRow extends TableRow{
+        public DetailedRecordRow(Result record) {
+            super(RecordActivity.this);
+            setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, TableRow.LayoutParams.WRAP_CONTENT));
+            setBackgroundResource(R.drawable.table_row_bg); // Assuming you have a drawable for row background
+            if (record.getStartTimeID() == -1)
+                return;
+
+            GFTime startTime = MainApplication.getInstance().getDao().getTimeById(record.getStartTimeID());
+            GFTime endTime = MainApplication.getInstance().getDao().getTime(record.getEndTimeID());
+            RecordCell minesCell = new DetailedRecordCell(record.getMineCount());
+            RecordCell fieldSizeCell = new DetailedRecordCell(record.getHeight() + "*" + record.getWidth());
+            RecordCell difficultyCell = new DetailedRecordCell(record.getDifficultyDescription());
+            RecordCell timeCell = new DetailedRecordCell(record.getInterval());
+            addView(difficultyCell);
+            addView(fieldSizeCell);
+            addView(minesCell);
+//            addView(timeCell);
+            addView(new DetailedRecordCell(startTime));
+            addView(new DetailedRecordCell(endTime));
         }
     }
 
@@ -86,6 +111,12 @@ public class RecordActivity extends AppCompatActivity {
             setPadding(16, 16, 16, 16); // Padding for better readability
             setBackgroundResource(R.drawable.table_cell_bg); // Assuming you have a drawable for cell background
             setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1f));
+        }
+    }
+    class DetailedRecordCell extends RecordCell{
+        public DetailedRecordCell(Object value){
+            super(value);
+            setTextSize(20);
         }
     }
 

@@ -2,11 +2,10 @@ package org.goldfish.minesweeper_android_01;
 
 import android.app.Application;
 import android.content.Context;
-import android.os.Build;
+
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 
-import androidx.annotation.RequiresApi;
 import androidx.room.Room;
 
 import org.goldfish.minesweeper_android_01.persistance.dao.RecordDAO;
@@ -31,7 +30,6 @@ public class MainApplication extends Application {
         return instance;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
     public void onCreate() {
         super.onCreate();
@@ -40,6 +38,7 @@ public class MainApplication extends Application {
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
+
         dao = database.dao();
         try {
             vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
