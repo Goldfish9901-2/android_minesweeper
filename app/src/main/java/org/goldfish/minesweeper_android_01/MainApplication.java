@@ -1,11 +1,14 @@
 package org.goldfish.minesweeper_android_01;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.os.VibratorManager;
 
+import androidx.annotation.NonNull;
 import androidx.room.Room;
 
 import org.goldfish.minesweeper_android_01.persistance.dao.RecordDAO;
@@ -24,13 +27,13 @@ public class MainApplication extends Application {
     private List<Integer> validEffectIds;
     private Vibrator vibrator;
 
-//    private ExecutorService executorService;
-
+    @NonNull
     public static MainApplication getInstance() {
         return instance;
     }
 
     @Override
+    @SuppressLint({"deprecated"})
     public void onCreate() {
         super.onCreate();
         instance = this;
@@ -41,9 +44,15 @@ public class MainApplication extends Application {
 
         dao = database.dao();
         try {
-            vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (!vibrator.hasVibrator())
-                throw new AssertionError("vibration.hasVibrator failed");
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                // Android 12 及以上：通过 VibratorManager 获取
+                VibratorManager vibratorManager = (VibratorManager) getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+                vibrator = vibratorManager.getDefaultVibrator();
+            } else {
+                // 旧版本：继续使用旧方法（需 @SuppressLint 注解忽略弃用警告）
+
+                vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            }
         } catch (Throwable ignored) {
             vibrator = null;
         }

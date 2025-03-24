@@ -2,6 +2,7 @@ package org.goldfish.minesweeper_android_01.persistance.dao;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
@@ -29,12 +30,13 @@ public interface RecordDAO {
     GFTime getTime(int id);
 
     @Insert(entity = GFTime.class)
-    void insertTime(GFTime time);
+    void insertTime(@NonNull GFTime time);
 
     @Query("SELECT id FROM GFTime WHERE month = :month AND day = :day AND hour = :hour AND minute = :minute AND second = :second")
     List<Integer> getTimeId(int month, int day, int hour, int minute, int second);
 
-    default List<Integer> getTimeId(GFTime time) {
+    @NonNull
+    default List<Integer> getTimeId(@NonNull GFTime time) {
         return getTimeId(time.getMonth(), time.getDay(), time.getHour(), time.getMinute(), time.getSecond());
     }
 
@@ -52,5 +54,5 @@ public interface RecordDAO {
     }
 
     @Insert(entity = Result.class)
-    void recordGame(Result result);
+    void recordGame(@NonNull Result result);
 }

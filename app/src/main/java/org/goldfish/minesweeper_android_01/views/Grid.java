@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01.logic;
+package org.goldfish.minesweeper_android_01.views;
 //Grid.java
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -6,7 +6,6 @@ import static android.widget.Toast.LENGTH_SHORT;
 import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
 
@@ -23,6 +21,7 @@ import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.Resources;
 import org.goldfish.minesweeper_android_01.VibrationTypes;
+import org.goldfish.minesweeper_android_01.logic.MineTriggeredException;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
 import java.util.HashSet;
@@ -43,12 +42,13 @@ public class Grid extends AppCompatImageButton
     private final Set<Grid> neighbors;
     private final Integer[] surroundingMinesResourceIDs;
     private final int SIZE = 100;
+    @NonNull
     public GameActivity activity;
     private STATE state;
     private boolean mine;
     private int surroundingMines;
 
-    public Grid(GameActivity activity, int row, int col) {
+    public Grid(@NonNull GameActivity activity, int row, int col) {
         super(activity);
         this.row = row;
         this.col = col;
@@ -86,15 +86,17 @@ public class Grid extends AppCompatImageButton
         return mine;
     }
 
+    @NonNull
     public STATE getState() {
         return state;
     }
 
+    @NonNull
     public Set<Grid> getNeighbors() {
         return neighbors;
     }
 
-    public boolean addNeighbor(Grid neighbor) {
+    public boolean addNeighbor(@NonNull Grid neighbor) {
         return neighbors.add(neighbor);
     }
 
@@ -122,14 +124,15 @@ public class Grid extends AppCompatImageButton
         if (state == STATE.FLAG) {
             return;
         }
-        do {
+        CHECK_TRIGGERED:
+        {
             if (!isMine()) {
                 activity.getController().addFinished(this);
-                break;
+                break CHECK_TRIGGERED;
             }
-            if (reveal) break;
+            if (reveal) break CHECK_TRIGGERED;
             throw new MineTriggeredException("Mine triggered.");
-        } while (false);
+        }
 
         Log.d("open", toString());
         state = STATE.OPEN;
@@ -179,6 +182,7 @@ public class Grid extends AppCompatImageButton
         this.icon = drawable;
     }
 
+    @Nullable
     public Drawable getIcon() {
         return icon;
     }
@@ -250,7 +254,7 @@ public class Grid extends AppCompatImageButton
     private class ClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
-            MainApplication.vibrate(TICK);
+//            MainApplication.vibrate(TICK);
             try {
                 activity.getController().open(Grid.this, state == STATE.OPEN);
             } catch (MineTriggeredException e) {

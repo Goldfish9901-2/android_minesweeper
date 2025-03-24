@@ -37,58 +37,64 @@
                 android:layout_weight="1" />
 
         </LinearLayout>
-
-        <ScrollView
-            android:id="@+id/rec_summary_wrapper"
+        <HorizontalScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TableLayout
-                android:id="@+id/record_table"
+            android:layout_height="wrap_content"
+            >
+            <ScrollView
+                android:id="@+id/rec_summary_wrapper"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-                <TableRow
+                <TableLayout
+                    android:id="@+id/record_table"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/table_row_bg">
-                    <!--                    每行先难度 再高度宽度 再雷数 再时间-->
-                    <TextView
+                    android:layout_height="wrap_content">
+
+                    <TableRow
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/table_cell_bg"
-                        android:text="@string/difficulty"
-                        android:textSize="30sp" />
+                        android:background="@drawable/table_row_bg">
+                        <!--                    每行先难度 再高度宽度 再雷数 再时间-->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/table_cell_bg"
+                            android:text="@string/difficulty"
+                            android:textSize="30sp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/table_cell_bg"
-                        android:text="@string/records_fields_size"
-                        android:textSize="30sp" />
-
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/table_cell_bg"
-                        android:text="@string/records_mine"
-                        android:textSize="30sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/table_cell_bg"
-                        android:text="@string/records_time"
-                        android:textSize="30sp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/table_cell_bg"
+                            android:text="@string/records_fields_size"
+                            android:textSize="30sp" />
 
 
-                </TableRow>
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/table_cell_bg"
+                            android:text="@string/records_mine"
+                            android:textSize="30sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="@drawable/table_cell_bg"
+                            android:text="@string/records_time"
+                            android:textSize="30sp" />
 
 
-            </TableLayout>
+                    </TableRow>
 
-        </ScrollView>
+
+                </TableLayout>
+
+            </ScrollView>
+        </HorizontalScrollView>
+
+
 
 <!--        <Space-->
 <!--            android:layout_width="match_parent"-->

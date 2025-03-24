@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-
-
     >
 
-    <!--    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>-->
-    <!--    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>-->
     <uses-permission android:name="android.permission.VIBRATE" />
     <application
         android:name=".MainApplication"
@@ -22,12 +18,6 @@
         <activity
             android:name=".views.record.RecordActivity"
             android:exported="false" />
-
-        <meta-data
-            android:name="com.amap.api.v2.apikey"
-            android:value="@string/AMAP_api_key" />
-
-        <!--        <service android:name="com.amap.api.location.APSService" />-->
 
         <activity
             android:name=".views.entrance.activities.EntranceActivity"

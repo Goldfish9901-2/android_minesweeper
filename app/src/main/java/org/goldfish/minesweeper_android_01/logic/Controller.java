@@ -2,8 +2,6 @@ package org.goldfish.minesweeper_android_01.logic;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
-import static java.lang.Thread.sleep;
-
 import android.content.Context;
 import android.os.SystemClock;
 import android.util.Log;
@@ -11,9 +9,11 @@ import android.widget.Chronometer;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
+import org.goldfish.minesweeper_android_01.views.Grid;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 
@@ -34,10 +34,13 @@ import java.util.stream.Stream;
  */
 
 public class Controller {
-    public static String thrower = "GOLDFISH_CAUGHT";
+    public final static String thrower = "GOLDFISH_CAUGHT";
 
-    private final int height, width, mines;
-    Grid[][] grids;
+    private final int height;
+    private final int width;
+    private final int mines;
+
+    private final Grid[][] grids;
     /**
      * Set of finished grids<br/>
      * its size ( i.e. {@link Collection#size()}) is used to determine if the game is finished
@@ -48,15 +51,16 @@ public class Controller {
     private int used;
     private boolean finished;
 
+    @NonNull
     public Result getResult() {
         return result;
     }
 
     private Result result;
 
-    public Controller(Result result) {
+    public Controller(@NonNull Result result) {
 
-        this(result.getHeight(), result.getWidth(), result.getMineCount(), result.getDifficultyDescription());
+        this(result.getHeight(), result.getWidth(), result.getMineCount());
         this.result = result;
     }
 
@@ -69,7 +73,7 @@ public class Controller {
      */
 
 
-    public Controller(int height, int width, int mines, String difficulty_description) {
+    public Controller(int height, int width, int mines) {
         this.height = height;
         this.width = width;
         this.mines = mines;
@@ -79,7 +83,7 @@ public class Controller {
         this.finished = false;
     }
 
-    public static void promptAndExit(Context activity) {
+    public static void promptAndExit(@NonNull Context activity) {
         Toast.makeText(activity, "下次扫雷再见！", LENGTH_SHORT).show();
         System.exit(0);
     }
@@ -93,7 +97,7 @@ public class Controller {
      *
      * @param activity 指定的窗口
      */
-    public void setActivity(GameActivity activity) {
+    public void setActivity(@NonNull GameActivity activity) {
         this.activity = activity;
     }
 
@@ -103,7 +107,7 @@ public class Controller {
      * @param grid 要添加的格子
      */
 
-    public void add(Grid grid) {
+    public void add(@NonNull Grid grid) {
         if (used >= height * width) throw new RuntimeException("Array Already Full");
         grids[used / width][used % width] = grid;
         used++;
@@ -166,6 +170,7 @@ public class Controller {
      *              9 10 11 12 13 14 15 16 17<br/>
      * @return 格子
      */
+    @Nullable
     public Grid getGrid(int index) {
         return getGrid(index / width, index % width);
     }
@@ -176,6 +181,7 @@ public class Controller {
      * @return 格子的对象
      */
 
+    @Nullable
     public Grid getGrid(int row, int col) {
         try {
             return grids[row][col];
@@ -200,7 +206,7 @@ public class Controller {
      * @param start 用户选中的格子 此格及周围不得为雷
      */
 
-    public void generateMine(Grid start) throws MineTriggeredException {
+    public void generateMine(@NonNull Grid start) throws MineTriggeredException {
         Log.i("Controller:generateMine",
                 "generateMine: " + "<" + start.getRow() + '-' + start.getCol() + '>');
         Set<Grid> invalidGrids = new LinkedHashSet<>();
@@ -241,14 +247,14 @@ public class Controller {
 
         for (int index = 0; index < width * height; index++) {
             Log.v("Controller:generateMine", "UPDATE");
-            getGrid(index).countSurroundings();
+            Objects.requireNonNull(getGrid(index)).countSurroundings();
         }
         open(start);
 
         for (int index = 0; index < width * height; index++) {
 //            getGrid(index).updateState();
 //            activity.submitGridOpenAnimation(getGrid(index));
-            getGrid(index).prepared();
+            Objects.requireNonNull(getGrid(index)).prepared();
         }
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
@@ -279,7 +285,7 @@ public class Controller {
      * @param start 起始格子
      * @throws MineTriggeredException 触雷
      */
-    public void open(Grid start) throws MineTriggeredException {
+    public void open(@NonNull Grid start) throws MineTriggeredException {
         open(start, false);
     }
 
@@ -297,7 +303,7 @@ public class Controller {
      * @throws MineTriggeredException 触雷
      */
 
-    public void open(Grid start, boolean started) throws MineTriggeredException {
+    public void open(@NonNull Grid start, boolean started) throws MineTriggeredException {
         Queue<Grid> queue = new LinkedList<>();
         boolean[][] visited = new boolean[height][width];
         final boolean[] refreshActivity = {true};
@@ -460,6 +466,7 @@ public class Controller {
      * @return 对话框
      */
 
+    @NonNull
     public AlertDialog getFinishDialog(boolean win) {
         finished = true;
         for (Grid[] row : grids) {

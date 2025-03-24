@@ -12,17 +12,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.ColorInt;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 import org.goldfish.minesweeper_android_01.persistance.entity.ResultFieldNames;
 import org.goldfish.minesweeper_android_01.logic.Controller;
-import org.goldfish.minesweeper_android_01.logic.Grid;
+import org.goldfish.minesweeper_android_01.views.Grid;
 
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 /**
  * {@code GameActivity} 游戏界面 <br/>
@@ -38,7 +41,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     private Handler handler;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_game);
@@ -55,13 +58,13 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
             return;
         }
         String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
-        singleDelay = 500 / (height * width);
+        singleDelay = 300 / (height * width);
         Result mode;
         try {
             mode = (Result) intent;
             Objects.requireNonNull(mode);
         } catch (RuntimeException exception) {
-            Toast.makeText(this,"无法自动获取游戏属性",Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "无法自动获取游戏属性", Toast.LENGTH_SHORT).show();
             mode = new Result();
             mode.setHeight(height);
             mode.setWidth(width);
@@ -111,10 +114,12 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         controller.findSurroundings();
     }
 
+    @NonNull
     public Controller getController() {
         return controller;
     }
 
+    @NonNull
     public TextView getMinePrompt() {
         return minePrompt;
     }
@@ -122,43 +127,40 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     // In GameActivity.java
     private int singleDelay;
 
-    private final Queue<Grid> displayQueue = new java.util.LinkedList<>();
+    private final Queue<Grid> displayQueue = new LinkedBlockingDeque<>();
 
-    public void submitGridOpenAnimation(Grid grid) {
+    public void submitGridOpenAnimation(@NonNull Grid grid) {
         submitGridOpenAnimation(grid, false);
     }
 
-    public void submitGridOpenAnimation(Grid grid, boolean refresh) {
-        synchronized (displayQueue) {
-            if (displayQueue.isEmpty()) {
-                displayQueue.add(grid);
-                handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
-            } else {
-                Grid quickRemove;
-                if (refresh) {
-                    while ((quickRemove = displayQueue.poll()) != null) {
-                        quickRemove.updateDisplay();
-                    }
-                    return;
+    public void submitGridOpenAnimation(@NonNull Grid grid, boolean refresh) {
+
+        if (displayQueue.isEmpty()) {
+            displayQueue.add(grid);
+            handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
+        } else {
+            Grid quickRemove;
+            if (refresh) {
+                while ((quickRemove = displayQueue.poll()) != null) {
+                    quickRemove.updateDisplay();
                 }
-                displayQueue.add(grid);
+                return;
             }
+            displayQueue.add(grid);
         }
+
     }
 
     private void displayGridOpenAnimation() {
-        Grid grid;
-        synchronized (displayQueue) {
-            grid = displayQueue.poll();
+        try {
+            Grid grid = displayQueue.remove();
+            if (grid == null) return;
+            handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
+            if (updated(grid)) return;
+            grid.setBackgroundColor(opening_color);
+            handler.postDelayed(grid::updateDisplay, singleDelay);
+        } catch (RuntimeException ignored) {
         }
-        if (grid == null) return;
-        handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
-
-        if (updated(grid))
-            return;
-        grid.setBackgroundColor(opening_color);
-        handler.postDelayed(grid::updateDisplay, singleDelay);
-
     }
 
     private boolean updated(Grid grid) {
@@ -171,7 +173,9 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         try {
             switch (grid.getState()) {
                 case CLOSE:
-                    if (Objects.requireNonNull(colorDrawable).getColor() == Color.GRAY)
+                    if (Objects.requireNonNull(colorDrawable).getColor() == Color.GRAY
+                            && grid.getIcon() == null
+                    )
                         return true;
                     break;
                 case OPEN:

@@ -4,10 +4,14 @@ import android.app.Activity;
 import android.content.Intent;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
+import androidx.room.Relation;
+
+import com.bin.david.form.annotation.SmartTable;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
@@ -17,6 +21,7 @@ import java.time.ZoneOffset;
 /**
  * {@code Result} 游戏结果信息 <br/>
  */
+@SmartTable(name="游戏结果")
 @Entity
 public class Result extends Intent implements ResultFieldNames {
 
@@ -62,7 +67,7 @@ public class Result extends Intent implements ResultFieldNames {
      */
     int endTimeID;
 
-    public Result(Activity activity) {
+    public Result(@NonNull Activity activity) {
         super(activity, GameActivity.class);
         startTimeID = -1;
         endTimeID = -1;
@@ -77,7 +82,8 @@ public class Result extends Intent implements ResultFieldNames {
     }
 
 
-    public static Result EASY(Activity activity) {
+    @NonNull
+    public static Result EASY(@NonNull Activity activity) {
         Result result = new Result(activity);
         result.setHeight(9);
         result.setWidth(9);
@@ -87,7 +93,8 @@ public class Result extends Intent implements ResultFieldNames {
 
     }
 
-    public static Result MEDIUM(Activity activity) {
+    @NonNull
+    public static Result MEDIUM(@NonNull Activity activity) {
         Result result = new Result(activity);
         result.setHeight(16);
         result.setWidth(16);
@@ -96,7 +103,8 @@ public class Result extends Intent implements ResultFieldNames {
         return result;
     }
 
-    public static Result HARD(Activity activity) {
+    @NonNull
+    public static Result HARD(@NonNull Activity activity) {
         Result result = new Result(activity);
         result.setHeight(30);
         result.setWidth(16);
@@ -129,6 +137,7 @@ public class Result extends Intent implements ResultFieldNames {
         this.mineCount = mineCount;
     }
 
+    @NonNull
     public String getDifficultyDescription() {
         return String.valueOf(difficulty_description);
     }
@@ -167,11 +176,12 @@ public class Result extends Intent implements ResultFieldNames {
         this.endTimeID = endTimeID;
     }
 
+    @NonNull
     public String getDifficulty_description() {
         return difficulty_description;
     }
 
-    public void setDifficulty_description(String difficulty_description) {
+    public void setDifficulty_description(@NonNull String difficulty_description) {
         this.difficulty_description = difficulty_description;
     }
 
@@ -199,6 +209,7 @@ public class Result extends Intent implements ResultFieldNames {
         this.id = id;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Result{" +
@@ -211,7 +222,6 @@ public class Result extends Intent implements ResultFieldNames {
                 "\n\t width=" + width +
                 "\n\t mineCount=" + mineCount +
                 "\n\t difficulty_description='" + difficulty_description + '\'' +
-
                 '}';
     }
 }

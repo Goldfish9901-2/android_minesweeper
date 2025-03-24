@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace = "org.goldfish.minesweeper_android_01"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "org.goldfish.minesweeper_android_01"
         minSdk = 29
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
@@ -28,14 +28,17 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+
     }
     buildFeatures {
         viewBinding = true
     }
+    lint {
+        checkReleaseBuilds = false
+    }
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -45,9 +48,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+
+}
+
+dependencies {
+    implementation (libs.smarttable)
 }
 dependencies {
-
     implementation(libs.androidx.monitor)
     implementation(libs.room.runtime)
 
@@ -76,4 +83,11 @@ dependencies {
 
     // optional - Paging 3 Integration
     implementation(libs.room.paging)
+}
+allprojects {
+    gradle.projectsEvaluated {
+        tasks.withType<JavaCompile> {
+            options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+        }
+    }
 }
