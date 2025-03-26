@@ -258,7 +258,7 @@ public class Grid extends AppCompatImageButton
             try {
                 activity.getController().open(Grid.this, state == STATE.OPEN);
             } catch (MineTriggeredException e) {
-                activity.getController().Lose();
+                activity.getController().lose();
             }
         }
     }

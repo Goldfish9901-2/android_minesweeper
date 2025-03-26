@@ -17,9 +17,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.goldfish.minesweeper_android_01.R;
+import org.goldfish.minesweeper_android_01.logic.Controller;
+import org.goldfish.minesweeper_android_01.logic.SecondsTimer;
 import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 import org.goldfish.minesweeper_android_01.persistance.entity.ResultFieldNames;
-import org.goldfish.minesweeper_android_01.logic.Controller;
 import org.goldfish.minesweeper_android_01.views.Grid;
 
 import java.util.Locale;
@@ -33,85 +34,117 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class GameActivity extends AppCompatActivity implements ResultFieldNames {
     @ColorInt
     private int opening_color;
-
     private Controller controller;
-
     private TextView minePrompt;
-
-    private Handler handler;
+    private Handler displayQueueHandler;
+    private SecondsTimer timer;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_game);
 
         Intent intent = getIntent();
-        GridLayout layout;
-
-        int height = intent.getIntExtra(HEIGHT, 0);
-        int width = intent.getIntExtra(WIDTH, 0);
-        int mines = intent.getIntExtra(MINE_COUNT, 0);
-        if (height == 0 || width == 0 || mines == 0) {
-            Toast.makeText(this, "无法获取难度信息", Toast.LENGTH_SHORT).show();
+        Result mode = new Result();
+        try {
+            loadIntent(intent, mode);
+        } catch (RuntimeException runtimeException) {
+            Toast.makeText(this, runtimeException.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
-        String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
-        singleDelay = 300 / (height * width);
-        Result mode;
-        try {
-            mode = (Result) intent;
-            Objects.requireNonNull(mode);
-        } catch (RuntimeException exception) {
-            Toast.makeText(this, "无法自动获取游戏属性", Toast.LENGTH_SHORT).show();
-            mode = new Result();
-            mode.setHeight(height);
-            mode.setWidth(width);
-            mode.setMineCount(mines);
-            mode.setDifficulty_description(difficulty_description);
-        }
 
+        // prepare controller
         controller = new Controller(mode);
         controller.setActivity(this);
 
-        Toast.makeText(this, String.format(Locale.CHINA, "模式: %s 高度: %d, 宽度: %d, 雷数: %d", difficulty_description, height, width, mines), Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                this,
+                String.format(
+                        Locale.CHINA,
+                        "模式: %s 高度: %d, 宽度: %d, 雷数: %d",
+                        mode.getDifficultyDescription(), mode.getHeight(),
+                        mode.getWidth(), mode.getMineCount()
+                ), Toast.LENGTH_SHORT
+        ).show();
         try {
-            handler = new Handler(getMainLooper());
-
-            TextView titleTextView = findViewById(R.id.game_title);
-            titleTextView.setText(difficulty_description);
-
-            Chronometer chronometer = findViewById(R.id.goldfish_chronometer);
-            chronometer.setBase(0);
-            controller.setChronometer(chronometer);
-
-            minePrompt = findViewById(R.id.mine_counter);
-            minePrompt.setText(String.valueOf(mines));
-
-            layout = findViewById(R.id.grids_field);
-            layout.setColumnCount(width);
-            layout.setRowCount(height);
-
-            findViewById(R.id.exit_button).setOnClickListener(
-                    v -> Controller.promptAndExit(this));
-            findViewById(R.id.restart_button).setOnClickListener(
-                    v -> finish());
-
-            opening_color = getResources().getColor(R.color.opening, this.getTheme());
-
+            initComponents(mode.getDifficulty_description(), mode.getMineCount());
+            initMainLayout(mode.getWidth(), mode.getHeight());
         } catch (NullPointerException nullPointerException) {
             Toast.makeText(this, nullPointerException.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             Toast.makeText(this, "有组件无法定位", Toast.LENGTH_SHORT).show();
             finish();
-            return;
         }
+    }
+
+    public SecondsTimer getTimer() {
+        return timer;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        timer.start();
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+    }
+
+    private void loadIntent(Intent intent, Result mode) {
+        int height = intent.getIntExtra(HEIGHT, 0);
+        int width = intent.getIntExtra(WIDTH, 0);
+        int mines = intent.getIntExtra(MINE_COUNT, 0);
+        if (height == 0 || width == 0 || mines == 0)
+            throw new IllegalArgumentException("无法获取难度信息");
+        String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
+        singleDelay = 300f / (height * width);
+        // prepare persistence record
+
+        mode.setHeight(height);
+        mode.setWidth(width);
+        mode.setMineCount(mines);
+        mode.setDifficulty_description(difficulty_description);
+    }
+
+    private void initMainLayout(int width, int height) {
+        GridLayout layout;
+        layout = findViewById(R.id.grids_field);
+        layout.setColumnCount(width);
+        layout.setRowCount(height);
         for (int num = 0; num < width * height; num++) {
             Grid button = new Grid(this, num / width, num % width);
             controller.add(button);
             layout.addView(button);
         }
         controller.findSurroundings();
+    }
+
+    private void initComponents(String difficulty_description, int mines) {
+        displayQueueHandler = new Handler(getMainLooper());
+        timer = new SecondsTimer(getMainLooper());
+
+        // init components
+        TextView titleTextView = findViewById(R.id.game_title);
+        titleTextView.setText(difficulty_description);
+
+        Chronometer chronometer = findViewById(R.id.goldfish_chronometer);
+        chronometer.setBase(0);
+        controller.setChronometer(chronometer);
+
+        minePrompt = findViewById(R.id.mine_counter);
+        minePrompt.setText(String.valueOf(mines));
+
+
+        findViewById(R.id.exit_button).setOnClickListener(
+                v -> Controller.promptAndExit(this));
+        findViewById(R.id.restart_button).setOnClickListener(
+                v -> finish());
+
+        opening_color = getResources().getColor(R.color.opening, this.getTheme());
     }
 
     @NonNull
@@ -124,8 +157,10 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         return minePrompt;
     }
 
-    // In GameActivity.java
-    private int singleDelay;
+    /**
+     * indicates the delay between each grid opening
+     */
+    private float singleDelay;
 
     private final Queue<Grid> displayQueue = new LinkedBlockingDeque<>();
 
@@ -137,7 +172,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
 
         if (displayQueue.isEmpty()) {
             displayQueue.add(grid);
-            handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
+            displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
         } else {
             Grid quickRemove;
             if (refresh) {
@@ -155,10 +190,10 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         try {
             Grid grid = displayQueue.remove();
             if (grid == null) return;
-            handler.postDelayed(this::displayGridOpenAnimation, singleDelay);
+            displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
             if (updated(grid)) return;
             grid.setBackgroundColor(opening_color);
-            handler.postDelayed(grid::updateDisplay, singleDelay);
+            displayQueueHandler.postDelayed(grid::updateDisplay, (long) singleDelay);
         } catch (RuntimeException ignored) {
         }
     }

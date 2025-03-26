@@ -35,11 +35,9 @@ import java.util.stream.Stream;
 
 public class Controller {
     public final static String thrower = "GOLDFISH_CAUGHT";
-
     private final int height;
     private final int width;
     private final int mines;
-
     private final Grid[][] grids;
     /**
      * Set of finished grids<br/>
@@ -229,10 +227,11 @@ public class Controller {
                     break;
                 }
             }
-            if (exist) continue;
 
-            //loop exited because loc generated cannot be set mine
-            //so just try generating another one
+            if (exist) continue;
+            // loop exited because loc generated cannot be set mine
+            // so just try generating another one
+
             Grid candidateMinedGrid = getGrid(h, w);
             if (candidateMinedGrid == null) {
                 Log.w(Controller.thrower, "Controller:generateMine: " + h + ',' + w);
@@ -424,7 +423,7 @@ public class Controller {
     /**
      * 输掉游戏
      */
-    public void Lose() {
+    public void lose() {
         endGame(false);
         reveal();
         getFinishDialog(false).show();
@@ -433,10 +432,10 @@ public class Controller {
     private void endGame(boolean win) {
         finished = true;
         chronometer.stop();
-        result.end();
+        activity.getTimer().stop();
+        result.end(activity.getTimer().getTime());
         result.setWin(win);
-        if (win)
-            MainApplication.getInstance().getDao().recordGame(result);
+        MainApplication.getInstance().getDao().recordGame(result);
     }
 
     /**
