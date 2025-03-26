@@ -2,82 +2,88 @@ package org.goldfish.minesweeper_android_01.persistance.entity;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.Relation;
 
-import com.bin.david.form.annotation.SmartTable;
-
-import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
+import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
 /**
  * {@code Result} 游戏结果信息 <br/>
  */
-@SmartTable(name="游戏结果")
+//@SmartTable(name="游戏结果")
 @Entity
-public class Result extends Intent implements ResultFieldNames {
-
-    /**
-     * 数据库存储字段
-     */
+public sealed class Result
+        extends Intent
+        implements ResultFieldNames
+        permits ResultSummary {
     @PrimaryKey(autoGenerate = true)
-    int id;
-    /**
-     * 雷区高度
-     */
-    int height;
-
-    /**
-     * 雷区宽度
-     */
-    int width;
-    /**
-     * 雷数
-     */
-    int mineCount;
-    /**
-     * 难度描述
-     */
-    String difficulty_description;
-    /**
-     * 是否胜利
-     */
+    protected int id;
+    protected int height;
+    protected int width;
+    protected int mineCount;
+    protected String difficulty_description;
     @Nullable
-    Boolean win;
-    long interval;
-    /**
-     * 开始时间
-     * 指向{@link GFTime}数据库表中的记录
-     *
-     * @see GFTime
-     */
-    int startTimeID;
-    /**
-     * 结束时间
-     *
-     * @see #startTimeID
-     */
-    int endTimeID;
+    protected Boolean win;
+    protected long interval;
+    protected long startTime;
+    protected long endTime;
+    @Ignore
+    protected LocalDateTime startLocalDateTime;
+    @Ignore
+    protected LocalDateTime endLocalDateTime;
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+        this.startLocalDateTime = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.of("+8"));
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+        this.endLocalDateTime = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.of("+8"));
+    }
+
+    @NonNull
+    public LocalDateTime getStartLocalDateTime() {
+        return startLocalDateTime;
+    }
+
+    @Nullable
+    public Boolean getWin() {
+        return win;
+    }
+
+    @Nullable
+    public LocalDateTime getEndLocalDateTime() {
+        return endLocalDateTime;
+    }
+
 
     public Result(@NonNull Activity activity) {
         super(activity, GameActivity.class);
-        startTimeID = -1;
-        endTimeID = -1;
+        startTime = -1L;
+        endTime = -1L;
         win = null;
     }
 
     public Result() {
         super();
-        startTimeID = -1;
-        endTimeID = -1;
+        startTime = -1L;
+        endTime = -1L;
         win = null;
     }
 
@@ -142,39 +148,22 @@ public class Result extends Intent implements ResultFieldNames {
         return String.valueOf(difficulty_description);
     }
 
-    @Nullable
-    public Boolean isWin() {
-        return win;
-    }
 
     public void setWin(@Nullable Boolean win) {
         this.win = win;
     }
 
     public void start() {
-        GFTime startTime = new GFTime(GFTime.TIME_SOURCE.FROM_SYSTEM);
-        MainApplication.getInstance().getDao().insertTime(startTime);
-        this.startTimeID = MainApplication.getInstance().getDao().getTimeId(startTime).get(0);
+        this.startTime = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+        setStartTime(this.startTime);
     }
 
-    public void end() {
-        GFTime endTime = new GFTime(GFTime.TIME_SOURCE.FROM_SYSTEM);
-        MainApplication.getInstance().getDao().insertTime(endTime);
-        this.endTimeID = MainApplication.getInstance().getDao().getTimeId(endTime).get(0);
-        GFTime startTime = MainApplication.getInstance().getDao().getTimeById(startTimeID, true);
-        long endStamp = endTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
-        long startStamp = startTime.getTime().toEpochSecond(ZoneOffset.ofHours(8));
-        setInterval(endStamp - startStamp);
-        Log.w(MainApplication.TAG, MainApplication.getInstance().getDao().getAll().toString());
+    public void end(long time_true_spent) {
+        this.endTime = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8")); // 记录结束时间戳
+        setEndTime(endTime);
+        setInterval(time_true_spent); // 转换为秒级时间差
     }
 
-    public int getEndTimeID() {
-        return endTimeID;
-    }
-
-    public void setEndTimeID(int endTimeID) {
-        this.endTimeID = endTimeID;
-    }
 
     @NonNull
     public String getDifficulty_description() {
@@ -185,13 +174,6 @@ public class Result extends Intent implements ResultFieldNames {
         this.difficulty_description = difficulty_description;
     }
 
-    public int getStartTimeID() {
-        return startTimeID;
-    }
-
-    public void setStartTimeID(int startTimeID) {
-        this.startTimeID = startTimeID;
-    }
 
     public long getInterval() {
         return interval;
@@ -215,8 +197,8 @@ public class Result extends Intent implements ResultFieldNames {
         return "Result{" +
                 "\n\t win=" + win +
                 "\n\t interval=" + interval +
-                "\n\t startTimeID=" + startTimeID +
-                "\n\t endTimeID=" + endTimeID +
+                "\n\t start=" + startTime +
+                "\n\t end=" + endTime +
                 "\n\t id=" + id +
                 "\n\t height=" + height +
                 "\n\t width=" + width +
