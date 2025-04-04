@@ -16,7 +16,13 @@ import java.time.ZoneOffset;
 
 /**
  * {@code Result} 游戏结果信息 <br/>
- */
+ * 这个类在选择游戏配置时即实例化<br/>
+ * 计入游戏的难度描述、雷区大小、雷数等信息<br/>
+ * 在用户点击雷区后计入开始时间{@link Result#start()}<br/>
+ * 在用户结束游戏后计入结束时间{@link Result#end(long)}<br/>
+ * 游戏结果{@link Result#setWin(Boolean)}<br/>
+ * 并提交到数据库中<br/>
+ * */
 //@SmartTable(name="游戏结果")
 @Entity
 public sealed class Result

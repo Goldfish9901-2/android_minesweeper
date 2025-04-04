@@ -2,7 +2,7 @@ package org.goldfish.minesweeper_android_01.logic;
 
 import static android.widget.Toast.LENGTH_SHORT;
 
-import android.content.Context;
+import android.app.Activity;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Chronometer;
@@ -13,13 +13,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
+import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.utils.SharedUtils;
 import org.goldfish.minesweeper_android_01.views.Grid;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Queue;
@@ -46,18 +50,19 @@ public class Controller {
     Set<Grid> finishedGrids;
     GameActivity activity;
     Chronometer chronometer;
+    Cacher cacher;
     private int used;
     private boolean finished;
+    private Result result;
 
     @NonNull
     public Result getResult() {
+        result.setInterval(activity.getTimer().getTime());
         return result;
     }
 
-    private Result result;
 
     public Controller(@NonNull Result result) {
-
         this(result.getHeight(), result.getWidth(), result.getMineCount());
         this.result = result;
     }
@@ -81,9 +86,9 @@ public class Controller {
         this.finished = false;
     }
 
-    public static void promptAndExit(@NonNull Context activity) {
+    public static void promptAndExit(@NonNull Activity activity) {
         Toast.makeText(activity, "下次扫雷再见！", LENGTH_SHORT).show();
-        System.exit(0);
+        activity.finish();
     }
 
     public boolean isFinished() {
@@ -97,6 +102,7 @@ public class Controller {
      */
     public void setActivity(@NonNull GameActivity activity) {
         this.activity = activity;
+        this.cacher = new Cacher(this);
     }
 
     /**
@@ -258,7 +264,9 @@ public class Controller {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         result.start();
-
+        SharedUtils.startGame();
+        cacher.postDelayed(() -> cacher.cache(gridList(), getResult()),
+                10000);
     }
 
     /**
@@ -371,6 +379,21 @@ public class Controller {
         }
     }
 
+    @NonNull
+    public List<Grid> gridList() {
+        synchronized (this) {
+            List<Grid> list = new ArrayList<>();
+            if (grids == null)
+                return list;
+            for (Grid[] row : grids) {
+                if (row == null)
+                    continue;
+                list.addAll(Arrays.asList(row));
+            }
+            return list;
+        }
+    }
+
     /**
      * 添加非雷且已经打开的格子<br/>
      *
@@ -435,7 +458,7 @@ public class Controller {
         activity.getTimer().stop();
         result.end(activity.getTimer().getTime());
         result.setWin(win);
-        MainApplication.getInstance().getDao().recordGame(result);
+        MainApplication.getInstance().getRecordDAO().recordGame(result);
     }
 
     /**

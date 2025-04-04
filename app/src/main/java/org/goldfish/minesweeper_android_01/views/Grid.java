@@ -16,11 +16,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.core.content.ContextCompat;
+import androidx.room.Entity;
+import androidx.room.Ignore;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
-import org.goldfish.minesweeper_android_01.Resources;
-import org.goldfish.minesweeper_android_01.VibrationTypes;
+import org.goldfish.minesweeper_android_01.utils.Resources;
+import org.goldfish.minesweeper_android_01.utils.VibrationTypes;
 import org.goldfish.minesweeper_android_01.logic.MineTriggeredException;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
@@ -32,21 +34,27 @@ import java.util.Set;
  * 用于表示游戏中的一个格子
  */
 @SuppressLint("ViewConstructor")
+@Entity(primaryKeys = {"row", "column"})
 public class Grid extends AppCompatImageButton
         implements VibrationTypes, Comparable<Grid> {
     //info for controller only
-    private final int row;
-
-    private Drawable icon = null;
-    private final int col;
-    private final Set<Grid> neighbors;
-    private final Integer[] surroundingMinesResourceIDs;
-    private final int SIZE = 100;
-    @NonNull
-    public GameActivity activity;
+    private int row;
+    private int col;
     private STATE state;
     private boolean mine;
     private int surroundingMines;
+    @Ignore
+    private Drawable icon = null;
+    @Ignore
+    private final Set<Grid> neighbors;
+    @Ignore
+    private final Integer[] surroundingMinesResourceIDs;
+    @Ignore
+    private final int SIZE = 100;
+    @NonNull
+    @Ignore
+    public GameActivity activity;
+
 
     public Grid(@NonNull GameActivity activity, int row, int col) {
         super(activity);

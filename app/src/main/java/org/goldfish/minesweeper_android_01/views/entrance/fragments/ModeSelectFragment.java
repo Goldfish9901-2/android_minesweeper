@@ -7,11 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
-import org.goldfish.minesweeper_android_01.RefinedModeSelectListener;
+import org.goldfish.minesweeper_android_01.utils.RefinedModeSelectListener;
 import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 import org.goldfish.minesweeper_android_01.views.entrance.activities.EntranceActivity;
 import org.goldfish.minesweeper_android_01.views.record.RecordActivity;
@@ -33,7 +34,7 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
 
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@NonNull Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 

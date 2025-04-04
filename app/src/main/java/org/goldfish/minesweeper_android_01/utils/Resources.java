@@ -1,4 +1,7 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.utils;
+
+import org.goldfish.minesweeper_android_01.R;
+
 /**
  * 定义了一些常量
  *

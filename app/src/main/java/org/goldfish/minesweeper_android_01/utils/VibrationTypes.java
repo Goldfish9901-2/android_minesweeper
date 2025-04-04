@@ -1,4 +1,4 @@
-package org.goldfish.minesweeper_android_01;
+package org.goldfish.minesweeper_android_01.utils;
 
 import android.os.Build;
 import android.os.VibrationEffect;

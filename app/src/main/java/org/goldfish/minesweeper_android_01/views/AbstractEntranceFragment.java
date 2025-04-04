@@ -16,7 +16,7 @@ public abstract class AbstractEntranceFragment extends Fragment {
         builder.setTitle("警告");
         builder.setMessage("重置所有储存数据?");
         builder.setPositiveButton("Yes", (dialog, which) -> {
-            MainApplication.getInstance().getDao().deleteAll();
+            MainApplication.getInstance().getRecordDAO().deleteAll();
             Toast.makeText(view.getContext(), "数据已重置", Toast.LENGTH_SHORT).show();
         });
         builder.setNegativeButton("No", (dialog, which) -> {

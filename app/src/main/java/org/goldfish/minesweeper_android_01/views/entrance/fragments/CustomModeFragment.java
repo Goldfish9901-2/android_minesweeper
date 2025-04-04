@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
-import org.goldfish.minesweeper_android_01.RefinedModeSelectListener;
+import org.goldfish.minesweeper_android_01.utils.RefinedModeSelectListener;
 import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 import org.goldfish.minesweeper_android_01.views.AbstractEntranceFragment;
 

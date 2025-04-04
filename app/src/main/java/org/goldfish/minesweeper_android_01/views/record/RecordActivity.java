@@ -2,11 +2,8 @@ package org.goldfish.minesweeper_android_01.views.record;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.widget.Button;
 import android.widget.ScrollView;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -38,7 +35,7 @@ public class RecordActivity extends AppCompatActivity {
         });
         Button returnButton = findViewById(R.id.record_return_button);
         returnButton.setOnClickListener(v -> finish());
-        List<Result> records = MainApplication.getInstance().getDao().getWinRecords();
+        List<Result> records = MainApplication.getInstance().getRecordDAO().getWinRecords();
         if (records == null) {
             Toast.makeText(this, "无记录", Toast.LENGTH_SHORT).show();
             return;

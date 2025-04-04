@@ -3,7 +3,6 @@ package org.goldfish.minesweeper_android_01;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
-
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
@@ -11,7 +10,10 @@ import android.os.VibratorManager;
 import androidx.annotation.NonNull;
 import androidx.room.Room;
 
+import org.goldfish.minesweeper_android_01.logic.Controller;
+import org.goldfish.minesweeper_android_01.persistance.dao.GameCacheDAO;
 import org.goldfish.minesweeper_android_01.persistance.dao.RecordDAO;
+import org.goldfish.minesweeper_android_01.persistance.database.GameCacheDatabase;
 import org.goldfish.minesweeper_android_01.persistance.database.RecordDatabase;
 
 import java.util.ArrayList;
@@ -22,10 +24,18 @@ public class MainApplication extends Application {
 
     public static final String TAG = "Minesweeper";
     private static MainApplication instance = null;
-    private RecordDAO dao;
+    private RecordDAO recordDAO;
+    private GameCacheDAO gameCacheDAO;
 
     private List<Integer> validEffectIds;
     private Vibrator vibrator;
+
+    public MainApplication() {
+        validEffectIds = new ArrayList<>();
+        validEffectIds.add(VibrationEffect.EFFECT_TICK);
+        validEffectIds.add(VibrationEffect.EFFECT_CLICK);
+        validEffectIds.add(VibrationEffect.EFFECT_HEAVY_CLICK);
+    }
 
     @NonNull
     public static MainApplication getInstance() {
@@ -37,12 +47,18 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        RecordDatabase database = Room.databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
+        RecordDatabase recordDatabase = Room.databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
                 .allowMainThreadQueries()
                 .fallbackToDestructiveMigration()
                 .build();
+        GameCacheDatabase gameCacheDatabase = Room.databaseBuilder(this, GameCacheDatabase.class, "game_cache.db")
+                .allowMainThreadQueries()
+                .fallbackToDestructiveMigration()
+                .build();
+        gameCacheDAO = gameCacheDatabase.dao();
 
-        dao = database.dao();
+
+        recordDAO = recordDatabase.dao();
         try {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
                 // Android 12 及以上：通过 VibratorManager 获取
@@ -56,23 +72,26 @@ public class MainApplication extends Application {
         } catch (Throwable ignored) {
             vibrator = null;
         }
-        validEffectIds = new ArrayList<>();
-        validEffectIds.add(VibrationEffect.EFFECT_TICK);
-        validEffectIds.add(VibrationEffect.EFFECT_CLICK);
-        validEffectIds.add(VibrationEffect.EFFECT_HEAVY_CLICK);
+
     }
 
     public static void vibrate(int effectId) {
         Vibrator vibrator = getInstance().vibrator;
         if (vibrator == null)
             return;
-        if (getInstance().validEffectIds.stream().noneMatch(id->id==effectId))
+        if (getInstance().validEffectIds.stream().noneMatch(id -> id == effectId))
             return;
         vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
     }
 
 
-    public RecordDAO getDao() {
-        return dao;
+    public RecordDAO getRecordDAO() {
+        return recordDAO;
     }
+
+    public GameCacheDAO getGameCacheDAO() {
+        return gameCacheDAO;
+    }
+
+
 }

@@ -1,6 +1,6 @@
 package org.goldfish.minesweeper_android_01.persistance.entity;
 
-import org.goldfish.minesweeper_android_01.Resources;
+import org.goldfish.minesweeper_android_01.utils.Resources;
 
 public interface ResultFieldNames extends Resources {
     String ID = "id";

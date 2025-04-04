@@ -77,6 +77,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         }
     }
 
+    @NonNull
     public SecondsTimer getTimer() {
         return timer;
     }
@@ -111,6 +112,10 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     }
 
     private void initMainLayout(int width, int height) {
+        initMainLayout(width, height, false);
+    }
+
+    private void initMainLayout(int width, int height, boolean cached) {
         GridLayout layout;
         layout = findViewById(R.id.grids_field);
         layout.setColumnCount(width);
