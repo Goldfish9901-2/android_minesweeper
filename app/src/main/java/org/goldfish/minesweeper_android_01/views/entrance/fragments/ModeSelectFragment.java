@@ -8,12 +8,13 @@ import android.view.ViewGroup;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.utils.RefinedModeSelectListener;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 import org.goldfish.minesweeper_android_01.views.entrance.activities.EntranceActivity;
 import org.goldfish.minesweeper_android_01.views.record.RecordActivity;
 import org.goldfish.minesweeper_android_01.views.AbstractEntranceFragment;
@@ -34,13 +35,14 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
 
 
     @Override
-    public void onCreate(@NonNull Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    @Nullable
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_mode_select, container, false);
         easyButton = view.findViewById(R.id.easy_mode_button);
@@ -49,9 +51,9 @@ public class ModeSelectFragment extends AbstractEntranceFragment {
         recordButton = view.findViewById(R.id.record_button);
         customButton = view.findViewById(R.id.custom_mode_button);
 
-        easyButton.setOnClickListener(new RefinedModeSelectListener(Result.EASY(requireActivity()), requireActivity()));
-        mediumButton.setOnClickListener(new RefinedModeSelectListener(Result.MEDIUM(requireActivity()), requireActivity()));
-        hardButton.setOnClickListener(new RefinedModeSelectListener(Result.HARD(requireActivity()), requireActivity()));
+        easyButton.setOnClickListener(new RefinedModeSelectListener(GameInfo.EASY(requireActivity()), requireActivity()));
+        mediumButton.setOnClickListener(new RefinedModeSelectListener(GameInfo.MEDIUM(requireActivity()), requireActivity()));
+        hardButton.setOnClickListener(new RefinedModeSelectListener(GameInfo.HARD(requireActivity()), requireActivity()));
 
         recordButton.setOnClickListener(v ->
                 startActivity(new Intent(view.getContext(), RecordActivity.class)));

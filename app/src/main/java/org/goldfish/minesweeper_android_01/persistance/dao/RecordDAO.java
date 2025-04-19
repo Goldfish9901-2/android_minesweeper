@@ -5,21 +5,21 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 
 import java.util.List;
 
 @Dao
 public interface RecordDAO {
-    @Query("SELECT * FROM Result")
-    List<Result> getAll();
+    @Query("SELECT * FROM GameInfo")
+    List<GameInfo> getAll();
 
-    @Query("SELECT * FROM Result WHERE win = 1")
-    List<Result> getWinRecords();
+    @Query("SELECT * FROM GameInfo WHERE win = 1")
+    List<GameInfo> getWinRecords();
 
-    @Query("DELETE FROM Result")
+    @Query("DELETE FROM GameInfo")
     void deleteAll();
 
-    @Insert(entity = Result.class)
-    void recordGame(@NonNull Result result);
+    @Insert(entity = GameInfo.class)
+    void recordGame(@NonNull GameInfo gameInfo);
 }

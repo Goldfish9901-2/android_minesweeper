@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.os.SystemClock;
 import android.util.Log;
 import android.widget.Chronometer;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -13,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 import org.goldfish.minesweeper_android_01.utils.SharedUtils;
 import org.goldfish.minesweeper_android_01.views.Grid;
 import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
@@ -53,18 +54,18 @@ public class Controller {
     Cacher cacher;
     private int used;
     private boolean finished;
-    private Result result;
+    private GameInfo gameInfo;
 
     @NonNull
-    public Result getResult() {
-        result.setInterval(activity.getTimer().getTime());
-        return result;
+    public GameInfo getResult() {
+        gameInfo.setInterval(activity.getTimer().getTime());
+        return gameInfo;
     }
 
 
-    public Controller(@NonNull Result result) {
-        this(result.getHeight(), result.getWidth(), result.getMineCount());
-        this.result = result;
+    public Controller(@NonNull GameInfo gameInfo) {
+        this(gameInfo.getHeight(), gameInfo.getWidth(), gameInfo.getMineCount());
+        this.gameInfo = gameInfo;
     }
 
     /**
@@ -225,14 +226,13 @@ public class Controller {
         for (int i = 0; i < mines; ) {
             int h = (int) (Math.random() * height);
             int w = (int) (Math.random() * width);
-            boolean exist = false;
-
-            for (Grid grid : invalidGrids) {
-                if (h == grid.getRow() && w == grid.getCol()) {
-                    exist = true;
-                    break;
-                }
-            }
+            boolean exist = invalidGrids
+                    .stream()
+                    .anyMatch(
+                            grid ->
+                                    grid.getRow() == h &&
+                                            grid.getCol() == w
+                    );
 
             if (exist) continue;
             // loop exited because loc generated cannot be set mine
@@ -263,10 +263,9 @@ public class Controller {
         }
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
-        result.start();
-        SharedUtils.startGame();
+        gameInfo.start();
         cacher.postDelayed(() -> cacher.cache(gridList(), getResult()),
-                10000);
+                2000);
     }
 
     /**
@@ -364,9 +363,10 @@ public class Controller {
             Stream<Grid> openCandidates = current.getNeighbors().stream().filter(
                     grid -> !visited[grid.getRow()][grid.getCol()]
             );
-            openCandidates.forEach(grid -> {
-                queue.add(grid);
-                activity.submitGridOpenAnimation(grid, refreshActivity[0]);
+            openCandidates.forEach(open_candidate_grid -> {
+//                if (openCandidates == null) return;
+                queue.add(open_candidate_grid);
+                activity.submitGridOpenAnimation(open_candidate_grid, refreshActivity[0]);
                 refreshActivity[0] = false;
 //                visited[grid.getRow()][grid.getCol()] = true;
             });
@@ -454,11 +454,12 @@ public class Controller {
 
     private void endGame(boolean win) {
         finished = true;
+        SharedUtils.end();
         chronometer.stop();
         activity.getTimer().stop();
-        result.end(activity.getTimer().getTime());
-        result.setWin(win);
-        MainApplication.getInstance().getRecordDAO().recordGame(result);
+        gameInfo.end(activity.getTimer().getTime());
+        gameInfo.setWin(win);
+        MainApplication.getInstance().getRecordDAO().recordGame(gameInfo);
     }
 
     /**
@@ -468,10 +469,10 @@ public class Controller {
     public void reveal() {
         boolean refreshActivity = true;
         for (Grid[] row : grids) {
-            for (Grid g : row) {
+            for (Grid grid_to_reveal : row) {
                 try {
-                    g.open(true);
-                    activity.submitGridOpenAnimation(g, refreshActivity);
+                    grid_to_reveal.open(true);
+                    activity.submitGridOpenAnimation(grid_to_reveal, refreshActivity);
                     refreshActivity = false;
                 } catch (MineTriggeredException exception) {
                     Log.w("Controller:reveal", "MineTriggeredException");
@@ -493,8 +494,10 @@ public class Controller {
         finished = true;
         for (Grid[] row : grids) {
             for (Grid g : row) {
-                g.setOnClickListener(null);
-                g.setOnLongClickListener(null);
+                ImageButton button = g.getDisplayGrid();
+                if (button == null) continue;
+                button.setOnClickListener(null);
+                button.setOnLongClickListener(null);
             }
         }
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
@@ -513,7 +516,7 @@ public class Controller {
     }
 
     private @NonNull String getEndMessage(boolean win) {
-        long timeUsed = result.getInterval();
+        long timeUsed = gameInfo.getInterval();
         return win ? "用时：" + timeUsed + "秒" : "";
     }
 }

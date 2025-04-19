@@ -5,10 +5,10 @@ import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
 import org.goldfish.minesweeper_android_01.persistance.dao.RecordDAO;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 
 
-@Database(entities = {Result.class}, version = 1, exportSchema = false)
+@Database(entities = {GameInfo.class}, version = 1, exportSchema = false)
 public abstract class RecordDatabase extends RoomDatabase {
     @NonNull
     public abstract RecordDAO dao();

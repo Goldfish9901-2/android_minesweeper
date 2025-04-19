@@ -3,36 +3,38 @@ package org.goldfish.minesweeper_android_01.utils;
 import android.app.Activity;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 import org.goldfish.minesweeper_android_01.persistance.entity.ResultFieldNames;
 
 public class RefinedModeSelectListener implements View.OnClickListener, ResultFieldNames {
-    private final Result result;
+    private final GameInfo gameInfo;
     Activity activity;
     AlertDialog.Builder builder;
 
     public RefinedModeSelectListener(
-            Result result,
-            Activity activity) {
-        this.result = result;
+            @NonNull GameInfo gameInfo,
+            @NonNull Activity activity) {
+        this.gameInfo = gameInfo;
         this.activity = activity;
         this.builder = new AlertDialog.Builder(activity);
     }
 
     @Override
     public void onClick(View v) {
-        result.putExtra(HEIGHT, result.getHeight());
-        result.putExtra(WIDTH, result.getWidth());
-        result.putExtra(MINE_COUNT, result.getMineCount());
-        result.putExtra(DIFFICULTY_DESCRIPTION, result.getDifficultyDescription());
+        gameInfo.putExtra(HEIGHT, gameInfo.getHeight());
+        gameInfo.putExtra(WIDTH, gameInfo.getWidth());
+        gameInfo.putExtra(MINE_COUNT, gameInfo.getMineCount());
+        gameInfo.putExtra(DIFFICULTY_DESCRIPTION, gameInfo.getDifficultyDescription());
         builder.setTitle("确认你的难度");
-        builder.setMessage("模式:" + result.getDifficultyDescription() + "\n" +
-                "雷区高度: " + result.getHeight() + "\n" +
-                "雷区宽度: " + result.getWidth() + "\n" +
-                "雷个数: " + result.getMineCount());
+        builder.setMessage("模式:" + gameInfo.getDifficultyDescription() + "\n" +
+                "雷区高度: " + gameInfo.getHeight() + "\n" +
+                "雷区宽度: " + gameInfo.getWidth() + "\n" +
+                "雷个数: " + gameInfo.getMineCount());
         builder.setPositiveButton("确认", (dialog, which) -> {
-            activity.startActivity(result);
+            activity.startActivity(gameInfo);
         });
         builder.setNegativeButton("取消", (dialog, which) -> {
         });

@@ -18,17 +18,16 @@ import java.time.ZoneOffset;
  * {@code Result} 游戏结果信息 <br/>
  * 这个类在选择游戏配置时即实例化<br/>
  * 计入游戏的难度描述、雷区大小、雷数等信息<br/>
- * 在用户点击雷区后计入开始时间{@link Result#start()}<br/>
- * 在用户结束游戏后计入结束时间{@link Result#end(long)}<br/>
- * 游戏结果{@link Result#setWin(Boolean)}<br/>
+ * 在用户点击雷区后计入开始时间{@link GameInfo#start()}<br/>
+ * 在用户结束游戏后计入结束时间{@link GameInfo#end(long)}<br/>
+ * 游戏结果{@link GameInfo#setWin(Boolean)}<br/>
  * 并提交到数据库中<br/>
- * */
+ */
 //@SmartTable(name="游戏结果")
 @Entity
-public sealed class Result
+public class GameInfo
         extends Intent
-        implements ResultFieldNames
-        permits ResultSummary {
+        implements ResultFieldNames {
     @PrimaryKey(autoGenerate = true)
     protected int id;
     protected int height;
@@ -79,14 +78,14 @@ public sealed class Result
     }
 
 
-    public Result(@NonNull Activity activity) {
+    public GameInfo(@NonNull Activity activity) {
         super(activity, GameActivity.class);
         startTime = -1L;
         endTime = -1L;
         win = null;
     }
 
-    public Result() {
+    public GameInfo() {
         super();
         startTime = -1L;
         endTime = -1L;
@@ -95,34 +94,34 @@ public sealed class Result
 
 
     @NonNull
-    public static Result EASY(@NonNull Activity activity) {
-        Result result = new Result(activity);
-        result.setHeight(9);
-        result.setWidth(9);
-        result.setMineCount(10);
-        result.setDifficulty_description("简单");
-        return result;
+    public static GameInfo EASY(@NonNull Activity activity) {
+        GameInfo gameInfo = new GameInfo(activity);
+        gameInfo.setHeight(9);
+        gameInfo.setWidth(9);
+        gameInfo.setMineCount(10);
+        gameInfo.setDifficulty_description("简单");
+        return gameInfo;
 
     }
 
     @NonNull
-    public static Result MEDIUM(@NonNull Activity activity) {
-        Result result = new Result(activity);
-        result.setHeight(16);
-        result.setWidth(16);
-        result.setMineCount(40);
-        result.setDifficulty_description("中等");
-        return result;
+    public static GameInfo MEDIUM(@NonNull Activity activity) {
+        GameInfo gameInfo = new GameInfo(activity);
+        gameInfo.setHeight(16);
+        gameInfo.setWidth(16);
+        gameInfo.setMineCount(40);
+        gameInfo.setDifficulty_description("中等");
+        return gameInfo;
     }
 
     @NonNull
-    public static Result HARD(@NonNull Activity activity) {
-        Result result = new Result(activity);
-        result.setHeight(30);
-        result.setWidth(16);
-        result.setMineCount(99);
-        result.setDifficulty_description("困难");
-        return result;
+    public static GameInfo HARD(@NonNull Activity activity) {
+        GameInfo gameInfo = new GameInfo(activity);
+        gameInfo.setHeight(30);
+        gameInfo.setWidth(16);
+        gameInfo.setMineCount(99);
+        gameInfo.setDifficulty_description("困难");
+        return gameInfo;
     }
 
     public int getHeight() {

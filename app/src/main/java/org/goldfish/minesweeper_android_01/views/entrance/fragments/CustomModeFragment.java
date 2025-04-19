@@ -11,12 +11,13 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.goldfish.minesweeper_android_01.R;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 import org.goldfish.minesweeper_android_01.utils.RefinedModeSelectListener;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
 import org.goldfish.minesweeper_android_01.views.AbstractEntranceFragment;
 
 /**
@@ -35,7 +36,7 @@ public class CustomModeFragment extends AbstractEntranceFragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         giveUpListener = v -> {
             FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
@@ -125,8 +126,8 @@ public class CustomModeFragment extends AbstractEntranceFragment {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Result result = getCustomResult(heightSpinner, widthSpinner, minesSpinner);
-                View.OnClickListener listener = new RefinedModeSelectListener(result, requireActivity());
+                GameInfo gameInfo = getCustomResult(heightSpinner, widthSpinner, minesSpinner);
+                View.OnClickListener listener = new RefinedModeSelectListener(gameInfo, requireActivity());
                 inflatedView.findViewById(R.id.custom_start_button).setOnClickListener(listener);
             }
 
@@ -171,12 +172,12 @@ public class CustomModeFragment extends AbstractEntranceFragment {
     }
 
     @NonNull
-    private Result getCustomResult(
+    private GameInfo getCustomResult(
             @NonNull Spinner heightSpinner,
             @NonNull Spinner widthSpinner,
             @NonNull Spinner minesSpinner) {
 
-        Result result = new Result(requireActivity());
+        GameInfo gameInfo = new GameInfo(requireActivity());
         Integer height = (Integer) heightSpinner.getSelectedItem();
         Integer width = (Integer) widthSpinner.getSelectedItem();
         Integer mines = (Integer) minesSpinner.getSelectedItem();
@@ -187,11 +188,11 @@ public class CustomModeFragment extends AbstractEntranceFragment {
         } else if (mines == null) {
             Toast.makeText(requireContext(), "请选择雷数", Toast.LENGTH_SHORT).show();
         } else {
-            result.setHeight(height);
-            result.setWidth(width);
-            result.setMineCount(mines);
-            result.setDifficulty_description("自定义");
+            gameInfo.setHeight(height);
+            gameInfo.setWidth(width);
+            gameInfo.setMineCount(mines);
+            gameInfo.setDifficulty_description("自定义");
         }
-        return result;
+        return gameInfo;
     }
 }

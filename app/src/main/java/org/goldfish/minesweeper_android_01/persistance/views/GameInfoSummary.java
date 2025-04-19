@@ -1,10 +1,12 @@
-package org.goldfish.minesweeper_android_01.persistance.entity;
+package org.goldfish.minesweeper_android_01.persistance.views;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.bin.david.form.annotation.SmartColumn;
 import com.bin.david.form.annotation.SmartTable;
+
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -13,12 +15,12 @@ import java.util.List;
 import java.util.Locale;
 
 /**
- * entity built from {@link Result} for smart table framework display<br>
+ * entity built from {@link GameInfo} for smart table framework display<br>
  * most of its fields are just for reflection and can be left null
  */
 
 @SmartTable(name = "概况")
-public final class ResultSummary extends Result {
+public final class GameInfoSummary extends GameInfo {
     @SmartColumn(id = 2, name = "雷区大小")
     @Nullable
     private String mineSize;
@@ -38,23 +40,23 @@ public final class ResultSummary extends Result {
     @SmartColumn(id = 6, name = "耗时")
     private long interval;
 
-    public ResultSummary(@NonNull Result result) {
-        difficulty_description = result.getDifficulty_description();
-        mineCount = result.getMineCount();
-        mineSize = result.getHeight() > 0 && result.getWidth() > 0
+    public GameInfoSummary(@NonNull GameInfo gameInfo) {
+        difficulty_description = gameInfo.getDifficulty_description();
+        mineCount = gameInfo.getMineCount();
+        mineSize = gameInfo.getHeight() > 0 && gameInfo.getWidth() > 0
                 ? String.format(Locale.CHINA, "%d*%d",
-                result.getHeight(), result.getWidth())
+                gameInfo.getHeight(), gameInfo.getWidth())
                 : "未知大小";
-        startTime = LocalDateTime.ofEpochSecond(result.getStartTime(), 0, ZoneOffset.of("+8"));
-        endTime = LocalDateTime.ofEpochSecond(result.getEndTime(), 0, ZoneOffset.of("+8"));
-        interval = result.getInterval();
+        startTime = LocalDateTime.ofEpochSecond(gameInfo.getStartTime(), 0, ZoneOffset.of("+8"));
+        endTime = LocalDateTime.ofEpochSecond(gameInfo.getEndTime(), 0, ZoneOffset.of("+8"));
+        interval = gameInfo.getInterval();
     }
 
     @NonNull
-    public static List<ResultSummary> summaries(@NonNull List<Result> raws) {
-        List<ResultSummary> summaries = new ArrayList<>();
+    public static List<GameInfoSummary> summaries(@NonNull List<GameInfo> raws) {
+        List<GameInfoSummary> summaries = new ArrayList<>();
         raws.forEach(
-                raw -> summaries.add(new ResultSummary(raw))
+                raw -> summaries.add(new GameInfoSummary(raw))
         );
         return summaries;
     }

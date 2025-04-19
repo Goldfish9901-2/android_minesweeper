@@ -10,8 +10,7 @@ import androidx.annotation.Nullable;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.persistance.dao.GameCacheDAO;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
-import org.goldfish.minesweeper_android_01.views.Grid;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 
 import java.util.Objects;
 
@@ -25,19 +24,23 @@ public class SharedUtils {
     private static final String DIFFICULTY = "goldfish_minesweeper_difficulty";
 
     private static final String TIME_SPENT = "goldfish_minesweeper_time_spent";
+
     public static void startGame() {
-        editor().putBoolean(STARTED, true).apply();
+        if (gameInfoPrepared())
+            editor().putBoolean(STARTED, true).apply();
     }
 
     public static boolean isStarted() {
         try {
-            return preferences().getBoolean(STARTED, false);
+            return preferences().getBoolean(STARTED, false) && gameInfoPrepared();
         } catch (ClassCastException e) {
             return false;
         }
     }
 
     public static void end() {
+        MainApplication.getInstance().getGameCacheDAO().deleteCache();
+        editor().clear();
         editor().putBoolean(STARTED, false).apply();
     }
 
@@ -52,17 +55,30 @@ public class SharedUtils {
         return preferences().edit();
     }
 
-    public static void saveGameInfo(@NonNull Result result) {
-        editor().putInt(WIDTH, result.getWidth())
-                .putInt(HEIGHT, result.getHeight())
-                .putInt(MINES_COUNT, result.getMineCount())
-                .putString(DIFFICULTY, result.getDifficulty_description())
-                .putLong(TIME_SPENT, result.getInterval())
+    public static void saveGameInfo(@NonNull GameInfo gameInfo) {
+        editor().putInt(WIDTH, gameInfo.getWidth())
+                .putInt(HEIGHT, gameInfo.getHeight())
+                .putInt(MINES_COUNT, gameInfo.getMineCount())
+                .putString(DIFFICULTY, gameInfo.getDifficulty_description())
+                .putLong(TIME_SPENT, gameInfo.getInterval())
                 .apply();
     }
 
+    public static boolean gameInfoPrepared() {
+        try {
+            return isStarted() &&
+                    preferences().getInt(WIDTH, 0) != 0 &&
+                    preferences().getInt(HEIGHT, 0) != 0 &&
+                    preferences().getInt(MINES_COUNT, 0) != 0 &&
+                    !preferences().getString(DIFFICULTY, "").isEmpty() &&
+                    preferences().getLong(TIME_SPENT, 0) != 0;
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
     @Nullable
-    public static Result loadGameInfo(Activity activity) {
+    public static GameInfo loadGameInfo(@NonNull Activity activity) {
         int width, height, mines;
         long time_spent;
         String difficulty;
@@ -83,21 +99,22 @@ public class SharedUtils {
             for (int r = 0; r < height; r++) {
                 for (int c = 0; c < width; c++) {
                     Objects.requireNonNull(
-                            dao.getGridByAbsloluteLocation(
+                            dao.getGridByAbsoluteLocation(
                                     r, c
                             ));
                 }
             }
-            Result result = new Result(activity);
-            result.setWidth(width);
-            result.setHeight(height);
-            result.setMineCount(mines);
-            result.setDifficulty_description(difficulty);
-            result.setInterval(time_spent);
-            return result;
         } catch (RuntimeException e) {
             Log.w(TAG, "loadGameInfo: ", e);
+            end();
             return null;
         }
+        GameInfo gameInfo = new GameInfo(activity);
+        gameInfo.setWidth(width);
+        gameInfo.setHeight(height);
+        gameInfo.setMineCount(mines);
+        gameInfo.setDifficulty_description(difficulty);
+        gameInfo.setInterval(time_spent);
+        return gameInfo;
     }
 }

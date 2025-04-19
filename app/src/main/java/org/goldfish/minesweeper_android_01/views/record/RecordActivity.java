@@ -14,8 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
-import org.goldfish.minesweeper_android_01.persistance.entity.ResultSummary;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
+import org.goldfish.minesweeper_android_01.persistance.views.GameInfoSummary;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class RecordActivity extends AppCompatActivity {
         });
         Button returnButton = findViewById(R.id.record_return_button);
         returnButton.setOnClickListener(v -> finish());
-        List<Result> records = MainApplication.getInstance().getRecordDAO().getWinRecords();
+        List<GameInfo> records = MainApplication.getInstance().getRecordDAO().getWinRecords();
         if (records == null) {
             Toast.makeText(this, "无记录", Toast.LENGTH_SHORT).show();
             return;
@@ -50,10 +50,10 @@ public class RecordActivity extends AppCompatActivity {
 //                ,dataStyle = new FontStyle(30, Color.parseColor("#888800"))
                 ;
 
-        SmartTable<ResultSummary> table = new SmartTable<>(this);
+        SmartTable<GameInfoSummary> table = new SmartTable<>(this);
         table.getConfig().setTableTitleStyle(style);
         table.getConfig().setColumnTitleStyle(columnStyle);
-        table.setData(ResultSummary.summaries(records));
+        table.setData(GameInfoSummary.summaries(records));
 
         ScrollView summaryView = findViewById(R.id.rec_summary_wrapper);
         summaryView.addView(table);

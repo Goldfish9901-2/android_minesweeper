@@ -6,8 +6,10 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Chronometer;
 import android.widget.GridLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +18,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.button.MaterialButton;
+
+import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.logic.Controller;
 import org.goldfish.minesweeper_android_01.logic.SecondsTimer;
-import org.goldfish.minesweeper_android_01.persistance.entity.Result;
+import org.goldfish.minesweeper_android_01.persistance.dao.GameCacheDAO;
+import org.goldfish.minesweeper_android_01.persistance.entity.GameInfo;
 import org.goldfish.minesweeper_android_01.persistance.entity.ResultFieldNames;
+import org.goldfish.minesweeper_android_01.utils.SharedUtils;
 import org.goldfish.minesweeper_android_01.views.Grid;
 
 import java.util.Locale;
@@ -45,9 +52,14 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         setContentView(R.layout.activity_game);
 
         Intent intent = getIntent();
-        Result mode = new Result();
+        GameInfo gameInfo;
+        boolean isStarted = SharedUtils.isStarted();
         try {
-            loadIntent(intent, mode);
+
+            gameInfo = isStarted
+                    ? Objects.requireNonNull(SharedUtils.loadGameInfo(this))
+                    : new GameInfo(this);
+            loadIntent(intent, gameInfo);
         } catch (RuntimeException runtimeException) {
             Toast.makeText(this, runtimeException.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             finish();
@@ -55,7 +67,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         }
 
         // prepare controller
-        controller = new Controller(mode);
+        controller = new Controller(gameInfo);
         controller.setActivity(this);
 
         Toast.makeText(
@@ -63,13 +75,13 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
                 String.format(
                         Locale.CHINA,
                         "模式: %s 高度: %d, 宽度: %d, 雷数: %d",
-                        mode.getDifficultyDescription(), mode.getHeight(),
-                        mode.getWidth(), mode.getMineCount()
+                        gameInfo.getDifficultyDescription(), gameInfo.getHeight(),
+                        gameInfo.getWidth(), gameInfo.getMineCount()
                 ), Toast.LENGTH_SHORT
         ).show();
         try {
-            initComponents(mode.getDifficulty_description(), mode.getMineCount());
-            initMainLayout(mode.getWidth(), mode.getHeight());
+            initComponents(gameInfo.getDifficulty_description(), gameInfo.getMineCount());
+            initMainLayout(gameInfo.getWidth(), gameInfo.getHeight(), isStarted);
         } catch (NullPointerException nullPointerException) {
             Toast.makeText(this, nullPointerException.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             Toast.makeText(this, "有组件无法定位", Toast.LENGTH_SHORT).show();
@@ -95,13 +107,14 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
 
     }
 
-    private void loadIntent(Intent intent, Result mode) {
+    private void loadIntent(Intent intent, GameInfo mode) {
         int height = intent.getIntExtra(HEIGHT, 0);
         int width = intent.getIntExtra(WIDTH, 0);
         int mines = intent.getIntExtra(MINE_COUNT, 0);
         if (height == 0 || width == 0 || mines == 0)
             throw new IllegalArgumentException("无法获取难度信息");
         String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
+        difficulty_description = Objects.requireNonNullElse(difficulty_description, "");
         singleDelay = 300f / (height * width);
         // prepare persistence record
 
@@ -111,19 +124,32 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         mode.setDifficulty_description(difficulty_description);
     }
 
-    private void initMainLayout(int width, int height) {
-        initMainLayout(width, height, false);
-    }
 
     private void initMainLayout(int width, int height, boolean cached) {
         GridLayout layout;
         layout = findViewById(R.id.grids_field);
         layout.setColumnCount(width);
         layout.setRowCount(height);
+        GameCacheDAO cacheDAO = MainApplication.getInstance().getGameCacheDAO();
         for (int num = 0; num < width * height; num++) {
-            Grid button = new Grid(this, num / width, num % width);
+            int row = num / width;
+            int col = num % width;
+            Grid button = cached
+                    ? cacheDAO.getGridByRelativeLocation(row, col, this)
+                    : new Grid(this, num / width, num % width);
+            if (button == null) {
+                String message = String.format(
+                        Locale.CHINA,
+                        "unable to load cached button at ( %s, %s ) for size [ %d , %d ]",
+                        row, col, height, width
+                );
+                Log.w(getClass().toString() , "initMainLayout: ", new IllegalStateException(message));
+                SharedUtils.end();
+                finish();
+                return;
+            }
             controller.add(button);
-            layout.addView(button);
+            layout.addView(button.getDisplayGrid());
         }
         controller.findSurroundings();
     }
@@ -174,18 +200,17 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     }
 
     public void submitGridOpenAnimation(@NonNull Grid grid, boolean refresh) {
-
+        Grid quickRemove;
+        if (refresh) {
+            while ((quickRemove = displayQueue.poll()) != null) {
+                quickRemove.updateDisplay();
+            }
+            return;
+        }
         if (displayQueue.isEmpty()) {
             displayQueue.add(grid);
             displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
         } else {
-            Grid quickRemove;
-            if (refresh) {
-                while ((quickRemove = displayQueue.poll()) != null) {
-                    quickRemove.updateDisplay();
-                }
-                return;
-            }
             displayQueue.add(grid);
         }
 
@@ -197,7 +222,9 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
             if (grid == null) return;
             displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
             if (updated(grid)) return;
-            grid.setBackgroundColor(opening_color);
+            ImageButton button = grid.getDisplayGrid();
+            if (button == null) return;
+            button.setBackgroundColor(opening_color);
             displayQueueHandler.postDelayed(grid::updateDisplay, (long) singleDelay);
         } catch (RuntimeException ignored) {
         }
@@ -206,8 +233,8 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     private boolean updated(Grid grid) {
         ColorDrawable colorDrawable;
         try {
-            colorDrawable = (ColorDrawable) grid.getBackground();
-        } catch (ClassCastException e) {
+            colorDrawable = (ColorDrawable) Objects.requireNonNull(grid.getDisplayGrid()).getBackground();
+        } catch (ClassCastException | NullPointerException e) {
             colorDrawable = null;
         }
         try {

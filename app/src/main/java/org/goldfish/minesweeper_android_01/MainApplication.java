@@ -22,7 +22,7 @@ import java.util.List;
 
 public class MainApplication extends Application {
 
-    public static final String TAG = "Minesweeper";
+    public static final String TAG = MainApplication.class.toString();
     private static MainApplication instance = null;
     private RecordDAO recordDAO;
     private GameCacheDAO gameCacheDAO;
@@ -43,7 +43,7 @@ public class MainApplication extends Application {
     }
 
     @Override
-    @SuppressLint({"deprecated"})
+    @SuppressLint({"-Xlint:deprecated"})
     public void onCreate() {
         super.onCreate();
         instance = this;
