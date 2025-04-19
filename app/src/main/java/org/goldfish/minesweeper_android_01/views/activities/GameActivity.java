@@ -31,6 +31,7 @@ import org.goldfish.minesweeper_android_01.utils.SharedUtils;
 import org.goldfish.minesweeper_android_01.views.Grid;
 
 import java.util.Locale;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -202,16 +203,17 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     public void submitGridOpenAnimation(@NonNull Grid grid, boolean refresh) {
         Grid quickRemove;
         if (refresh) {
-            while ((quickRemove = displayQueue.poll()) != null) {
-                quickRemove.updateDisplay();
-            }
-            return;
+           try {
+                while ((quickRemove = displayQueue.poll()) != null) {
+                    quickRemove.updateDisplay();
+                }
+            }catch (NoSuchElementException ignored){}
         }
-        if (displayQueue.isEmpty()) {
+        else{
             displayQueue.add(grid);
-            displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
-        } else {
-            displayQueue.add(grid);
+            if (!displayQueue.isEmpty()) {
+                displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
+            }
         }
 
     }
