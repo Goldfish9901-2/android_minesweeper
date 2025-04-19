@@ -49,6 +49,9 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
+    // https://mvnrepository.com/artifact/com.google.android.material/material
+    implementation(libs.material.v1120)
+
 }
 
 dependencies {

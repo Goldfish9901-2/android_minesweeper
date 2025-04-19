@@ -27,13 +27,15 @@
                 android:layout_width="match_parent"
                 android:layout_height="20sp" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/game_title"
                 android:textAlignment="center"
                 android:textSize="80sp"
+                app:backgroundTint="@color/gf_button"
+                app:cornerRadius="20dp"
                 app:layout_constraintStart_toStartOf="@id/imageView" />
 
             <Space
@@ -63,10 +65,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/easy_mode_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    app:backgroundTint="@color/gf_button"
+                    app:cornerRadius="20dp"
                     android:layout_weight="1"
                     android:text="@string/easy_mode_button_label"
                     android:textSize="40sp" />
@@ -76,11 +80,13 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/medium_mode_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    app:backgroundTint="@color/gf_button"
+                    app:cornerRadius="20dp"
                     android:text="@string/medium_mode_button_label"
                     android:textSize="40sp" />
 
@@ -110,12 +116,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/hard_mode_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textSize="40sp"
+                    app:backgroundTint="@color/gf_button"
+                    app:cornerRadius="20dp"
                     android:text="@string/hard_mode_button_label" />
 
                 <Space
@@ -123,12 +131,14 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/custom_mode_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:textSize="40sp"
+                    app:backgroundTint="@color/gf_button"
+                    app:cornerRadius="20dp"
                     android:text="@string/custom_mode_button_label" />
 
                 <Space
@@ -148,10 +158,12 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/record_button"
                     android:layout_width="100sp"
                     android:layout_height="wrap_content"
+                    app:backgroundTint="@color/gf_button"
+                    app:cornerRadius="20dp"
                     android:layout_weight="1"
                     android:textSize="40sp"
                     android:text="@string/record_button_label" />

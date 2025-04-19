@@ -19,7 +19,7 @@
         tools:layout_editor_absoluteY="-59dp"
         android:id="@+id/main_layout"
         >
-        <ImageView
+        <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/imageView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

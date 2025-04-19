@@ -3,4 +3,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="opening">#88f</color>
+    <color name="gf_button">#0089A1</color>
 </resources>
