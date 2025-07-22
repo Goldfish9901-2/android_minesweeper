@@ -13,5 +13,7 @@
         <item name="android:layout_margin">10dp</item>
     </style>
 
-    <style name="Theme.MineSweeperAndroid01" parent="Base.Theme.MineSweeperAndroid01" />
+    <style name="Theme.MineSweeperAndroid01" parent="Base.Theme.MineSweeperAndroid01" >
+        <item name="android:background">@color/background</item>
+    </style>
 </resources>

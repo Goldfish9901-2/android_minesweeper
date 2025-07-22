@@ -68,6 +68,7 @@ public class Grid
 
     @Ignore
     private int surroundingMines;
+
     @Ignore
     @Nullable
     private DisplayGrid displayGrid;
@@ -274,7 +275,7 @@ public class Grid
             setLayoutParams(params);
             setPadding(0, 0, 0, 0);
             setCropToPadding(true);
-            setBackgroundColor(Color.GRAY);
+            setBackgroundColor(ContextCompat.getColor(activity,R.color.grid_closed));
 
             roundCorner(activity);
 
@@ -313,12 +314,12 @@ public class Grid
             switch (state) {
                 case FLAG:
                     setImageDrawable(ContextCompat.getDrawable(activity, R.drawable.flag));
-                    roundCorner(activity,Color.GRAY);
+                    roundCorner(activity,ContextCompat.getColor(activity,R.color.grid_closed));
                     return;
                 case CLOSE:
                     Log.v("Grid::updateState", "Not opened.");
                     setImageDrawable(null);
-                    roundCorner(activity,Color.GRAY);
+                    roundCorner(activity,ContextCompat.getColor(activity,R.color.grid_closed));
                     return;
             }
             // now left opened grids

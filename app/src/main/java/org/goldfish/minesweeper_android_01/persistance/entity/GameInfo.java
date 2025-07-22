@@ -5,6 +5,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
@@ -13,6 +14,9 @@ import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@code Result} 游戏结果信息 <br/>
@@ -28,33 +32,51 @@ import java.time.ZoneOffset;
 public class GameInfo
         extends Intent
         implements ResultFieldNames {
+    @Setter
+    @Getter
+    @ColumnInfo
     @PrimaryKey(autoGenerate = true)
     protected int id;
+    @Setter
+    @Getter
+    @ColumnInfo
     protected int height;
+    @Setter
+    @Getter
+    @ColumnInfo
     protected int width;
+    @Setter
+    @Getter
+    @ColumnInfo
     protected int mineCount;
+    @Nullable
+    @ColumnInfo
     protected String difficulty_description;
     @Nullable
+    @ColumnInfo
     protected Boolean win;
+    @Getter
+    @Setter
+    @ColumnInfo
     protected long interval;
+    @Getter
+    @ColumnInfo
     protected long startTime;
+    @Getter
+    @ColumnInfo
     protected long endTime;
     @Ignore
+    @Nullable
+    @ColumnInfo
     protected LocalDateTime startLocalDateTime;
     @Ignore
+    @Nullable
+    @ColumnInfo
     protected LocalDateTime endLocalDateTime;
-
-    public long getStartTime() {
-        return startTime;
-    }
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
         this.startLocalDateTime = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.of("+8"));
-    }
-
-    public long getEndTime() {
-        return endTime;
     }
 
     public void setEndTime(long endTime) {
@@ -62,7 +84,7 @@ public class GameInfo
         this.endLocalDateTime = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.of("+8"));
     }
 
-    @NonNull
+    @Nullable
     public LocalDateTime getStartLocalDateTime() {
         return startLocalDateTime;
     }
@@ -124,30 +146,6 @@ public class GameInfo
         return gameInfo;
     }
 
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getMineCount() {
-        return mineCount;
-    }
-
-    public void setMineCount(int mineCount) {
-        this.mineCount = mineCount;
-    }
-
     @NonNull
     public String getDifficultyDescription() {
         return String.valueOf(difficulty_description);
@@ -179,22 +177,6 @@ public class GameInfo
         this.difficulty_description = difficulty_description;
     }
 
-
-    public long getInterval() {
-        return interval;
-    }
-
-    public void setInterval(long interval) {
-        this.interval = interval;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @NonNull
     @Override

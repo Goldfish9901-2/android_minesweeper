@@ -51,7 +51,7 @@ public class Controller {
     Set<Grid> finishedGrids;
     GameActivity activity;
     Chronometer chronometer;
-    Cacher cacher;
+    CacheManager cacheManager;
     private int used;
     private boolean finished;
     private GameInfo gameInfo;
@@ -103,7 +103,7 @@ public class Controller {
      */
     public void setActivity(@NonNull GameActivity activity) {
         this.activity = activity;
-        this.cacher = new Cacher(this);
+        this.cacheManager = new CacheManager(this);
     }
 
     /**
@@ -185,7 +185,6 @@ public class Controller {
      * @param col 格子的列号
      * @return 格子的对象
      */
-
     @Nullable
     public Grid getGrid(int row, int col) {
         try {
@@ -264,8 +263,12 @@ public class Controller {
         chronometer.setBase(SystemClock.elapsedRealtime());
         chronometer.start();
         gameInfo.start();
-        cacher.postDelayed(() -> cacher.cache(gridList(), getResult()),
-                2000);
+//        cacheManager.postDelayed(() -> cacheManager.cache(gridList(), getResult()),
+//                2000);
+    }
+
+    public void cache() {
+        cacheManager.cache(gridList(), getResult());
     }
 
     /**
@@ -331,8 +334,10 @@ public class Controller {
             notOpened.forEach(n -> {
                 if (Objects.requireNonNull(n.getState()) == Grid.STATE.FLAG) {
                     flagCount.getAndIncrement();
+                }else
+                {
+                    queue.add(n);
                 }
-                queue.add(n);
             });
             int remaining = start.getSurroundingMines() - flagCount.get();
             String message;
@@ -356,10 +361,8 @@ public class Controller {
                 continue;
             }
             current.open();
-
-
             visited[current.getRow()][current.getCol()] = true;
-            if (current.getSurroundingMines() != 0) continue;
+            if (current.getSurroundingMines() > 0) continue;
             Stream<Grid> openCandidates = current.getNeighbors().stream().filter(
                     grid -> !visited[grid.getRow()][grid.getCol()]
             );

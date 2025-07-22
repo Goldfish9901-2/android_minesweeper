@@ -1,78 +1,34 @@
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        mavenCentral()
-        maven { url = uri("https://jitpack.io") }
-    }
-}
-
 pluginManagement {
-
     repositories {
-//        maven {
-//            url = uri("https://jitpack.io")
-//        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/central")
-        }
-        maven {
+        // 阿里云加速镜像
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
+        maven { url = uri("https://maven.aliyun.com/repository/public/") }
+        maven { url = uri("https://maven.aliyun.com/repository/google/") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin/") }
 
-            url = uri("https://maven.aliyun.com/repository/public/")
-        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/google/")
-        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/gradle-plugin/")
-        }
+        // 官方源
         mavenLocal()
-        mavenCentral()
-    }
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
+        google()
         mavenCentral()
         gradlePluginPortal()
     }
-
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+
     repositories {
+        // 阿里云镜像
+        maven { url = uri("https://maven.aliyun.com/repository/central") }
+        maven { url = uri("https://maven.aliyun.com/repository/public/") }
+        maven { url = uri("https://maven.aliyun.com/repository/google/") }
+        maven { url = uri("https://maven.aliyun.com/repository/gradle-plugin/") }
 
-        maven {
-            url = uri("https://maven.aliyun.com/repository/central")
-        }
-        maven {
+        // JitPack（可选）
+        maven { url = uri("https://jitpack.io") }
 
-            url = uri("https://maven.aliyun.com/repository/public/")
-        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/google/")
-        }
-        maven {
-            url = uri("https://maven.aliyun.com/repository/gradle-plugin/")
-        }
+        // 官方源
         mavenLocal()
-        mavenCentral()
-    }
-    repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
-        gradlePluginPortal()
-    }
-    repositories {
         google()
         mavenCentral()
     }
@@ -80,4 +36,3 @@ dependencyResolutionManagement {
 
 rootProject.name = "MineSweeper-Android-0.1"
 include(":app")
- 

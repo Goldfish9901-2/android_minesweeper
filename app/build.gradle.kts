@@ -1,5 +1,7 @@
 plugins {
-    alias(libs.plugins.android.application)
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android") // 启用 Kotlin 插件
+//    kotlin("kapt")
 }
 
 android {
@@ -12,7 +14,6 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,72 +26,64 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-
     }
+
     buildFeatures {
         viewBinding = true
     }
+
     lint {
         checkReleaseBuilds = false
     }
 }
 
+
 dependencies {
+    // Android 基础库
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.material.v1120)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+
+    // 测试
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
 
-    // https://mvnrepository.com/artifact/com.google.android.material/material
-    implementation(libs.material.v1120)
-
-}
-
-dependencies {
-    implementation (libs.smarttable)
-}
-dependencies {
+    // 第三方库
+    implementation(libs.smarttable)
     implementation(libs.androidx.monitor)
+
+    // Room 数据库
     implementation(libs.room.runtime)
-
-//    // If this project uses any Kotlin source, use Kotlin Symbol Processing (KSP)
-//    // See Add the KSP plugin to your project
-//    ksp("androidx.room:room-compiler:$room_version")
-
-    // If this project only uses Java source, use the Java annotationProcessor
-    // No additional plugins are necessary
-    annotationProcessor(libs.room.compiler)
-
-    // optional - Kotlin Extensions and Coroutines support for Room
     implementation(libs.room.ktx)
-
-    // optional - RxJava2 support for Room
+    implementation(libs.room.paging)
     implementation(libs.androidx.room.room.rxjava22)
-
-    // optional - RxJava3 support for Room
     implementation(libs.androidx.room.room.rxjava32)
-
-    // optional - Guava support for Room, including Optional and ListenableFuture
     implementation(libs.androidx.room.guava)
-
-    // optional - Test helpers
     testImplementation(libs.androidx.room.testing)
 
-    // optional - Paging 3 Integration
-    implementation(libs.room.paging)
+    // Lombok 配置
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
+    annotationProcessor(libs.room.compiler)
+
+    // Lombok + Kotlin + kapt 支持
+//    kapt("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 }
-allprojects {
-    gradle.projectsEvaluated {
-        tasks.withType<JavaCompile> {
-            options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
-        }
+kotlin {
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
+}
+
+tasks.withType<JavaCompile> {
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
 }

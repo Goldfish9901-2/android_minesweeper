@@ -47,13 +47,15 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
-        RecordDatabase recordDatabase = Room.databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
+        RecordDatabase recordDatabase = Room
+                .databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
                 .allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigrationOnDowngrade(true)
                 .build();
-        GameCacheDatabase gameCacheDatabase = Room.databaseBuilder(this, GameCacheDatabase.class, "game_cache.db")
+        GameCacheDatabase gameCacheDatabase = Room
+                .databaseBuilder(this, GameCacheDatabase.class, "game_cache.db")
                 .allowMainThreadQueries()
-                .fallbackToDestructiveMigration()
+                .fallbackToDestructiveMigration( true)
                 .build();
         gameCacheDAO = gameCacheDatabase.dao();
 

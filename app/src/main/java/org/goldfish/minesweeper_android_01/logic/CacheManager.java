@@ -12,10 +12,10 @@ import org.goldfish.minesweeper_android_01.views.Grid;
 
 import java.util.List;
 
-public class Cacher extends Handler {
+public class CacheManager extends Handler {
     Controller controller;
 
-    public Cacher(@NonNull Controller controller) {
+    public CacheManager(@NonNull Controller controller) {
         super(controller.activity.getMainLooper());
         this.controller = controller;
     }
@@ -24,13 +24,13 @@ public class Cacher extends Handler {
         grid.forEach(MainApplication.getInstance().getGameCacheDAO()::insert);
         SharedUtils.startGame();
         SharedUtils.saveGameInfo(gameInfo);
-        postDelayed(() -> {
-            try {
-                cache(grid, controller.getResult());
-            } catch (Exception e) {
-                Log.w(getClass().toString(), "cache: ", e);
-            }
-        }, 2000);
+//        postDelayed(() -> {
+//            try {
+//                cache(grid, controller.getResult());
+//            } catch (Exception e) {
+//                Log.w(getClass().toString(), "cache: ", e);
+//            }
+//        }, 2000);
     }
 
 }

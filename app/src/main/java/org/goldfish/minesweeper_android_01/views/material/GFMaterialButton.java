@@ -15,22 +15,22 @@ import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.utils.MathUtils;
 
 public class GFMaterialButton extends MaterialButton {
-    public GFMaterialButton(@NonNull Activity context) {
+    public GFMaterialButton(@NonNull Context context) {
         super(context);
         this_init(context);
     }
 
-//    public GFMaterialButton(@NonNull Activity context, @Nullable AttributeSet attrs) {
-//        super(context, attrs);
-//        this_init(context);
-//    }
-//
-//    public GFMaterialButton(@NonNull Activity context, @Nullable AttributeSet attrs, int defStyleAttr) {
-//        super(context, attrs, defStyleAttr);
-//        this_init(context);
-//    }
+    public GFMaterialButton(@NonNull Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        this_init(context);
+    }
 
-    private void this_init(@NonNull Activity context) {
+    public GFMaterialButton(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        this_init(context);
+    }
+
+    private void this_init(@NonNull Context context) {
         int color = ContextCompat.getColor(context, R.color.gf_button);
         ColorStateList list = ColorStateList.valueOf(color);
         setBackgroundTintList(list);

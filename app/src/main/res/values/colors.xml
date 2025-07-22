@@ -2,6 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="opening">#88f</color>
+    <color name="grid_closed">#55f</color>
+    <color name="grid_opening">#88f</color>
     <color name="gf_button">#0089A1</color>
+    <color name="background">#E0F7FA</color>
+    <color name="highlight">#4DD0E1</color>
+    <color name="transparent">#00000000</color>
 </resources>

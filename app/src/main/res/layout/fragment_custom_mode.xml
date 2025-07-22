@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     tools:context=".views.entrance.fragments.CustomModeFragment">
 
     <LinearLayout
@@ -12,7 +13,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <Button
+            <org.goldfish.minesweeper_android_01.views.entrance.fragments.material.SelectionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/custom_out"
@@ -91,7 +92,7 @@
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <Button
+            <org.goldfish.minesweeper_android_01.views.entrance.fragments.material.SelectionButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/custom_start_button_label"

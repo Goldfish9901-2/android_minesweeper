@@ -18,8 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.button.MaterialButton;
-
 import org.goldfish.minesweeper_android_01.MainApplication;
 import org.goldfish.minesweeper_android_01.R;
 import org.goldfish.minesweeper_android_01.logic.Controller;
@@ -40,6 +38,7 @@ import java.util.concurrent.LinkedBlockingDeque;
  * {@code GameActivity} 游戏界面 <br/>
  */
 public class GameActivity extends AppCompatActivity implements ResultFieldNames {
+    final String TAG = getClass().toString();
     @ColorInt
     private int opening_color;
     private Controller controller;
@@ -117,6 +116,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         String difficulty_description = intent.getStringExtra(DIFFICULTY_DESCRIPTION);
         difficulty_description = Objects.requireNonNullElse(difficulty_description, "");
         singleDelay = 300f / (height * width);
+        Log.e(TAG, "loadIntent: " + singleDelay);
         // prepare persistence record
 
         mode.setHeight(height);
@@ -144,7 +144,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
                         "unable to load cached button at ( %s, %s ) for size [ %d , %d ]",
                         row, col, height, width
                 );
-                Log.w(getClass().toString() , "initMainLayout: ", new IllegalStateException(message));
+                Log.w(getClass().toString(), "initMainLayout: ", new IllegalStateException(message));
                 SharedUtils.end();
                 finish();
                 return;
@@ -176,7 +176,11 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
         findViewById(R.id.restart_button).setOnClickListener(
                 v -> finish());
 
-        opening_color = getResources().getColor(R.color.opening, this.getTheme());
+        findViewById(R.id.game_save_button).setOnClickListener(
+                v -> controller.cache()
+        );
+
+        opening_color = getResources().getColor(R.color.grid_opening, this.getTheme());
     }
 
     @NonNull
@@ -203,13 +207,13 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     public void submitGridOpenAnimation(@NonNull Grid grid, boolean refresh) {
         Grid quickRemove;
         if (refresh) {
-           try {
+            try {
                 while ((quickRemove = displayQueue.poll()) != null) {
                     quickRemove.updateDisplay();
                 }
-            }catch (NoSuchElementException ignored){}
-        }
-        else{
+            } catch (NoSuchElementException ignored) {
+            }
+        } else {
             displayQueue.add(grid);
             if (!displayQueue.isEmpty()) {
                 displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
@@ -221,7 +225,7 @@ public class GameActivity extends AppCompatActivity implements ResultFieldNames 
     private void displayGridOpenAnimation() {
         try {
             Grid grid = displayQueue.remove();
-            if (grid == null) return;
+
             displayQueueHandler.postDelayed(this::displayGridOpenAnimation, (long) singleDelay);
             if (updated(grid)) return;
             ImageButton button = grid.getDisplayGrid();

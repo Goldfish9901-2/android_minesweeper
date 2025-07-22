@@ -37,5 +37,6 @@
     <string name="elapsed_time">用时</string>
     <string name="start_time">开始时间</string>
     <string name="end_time">结束时间</string>
+    <string name="save_progress">保存进度</string>
 
 </resources>
