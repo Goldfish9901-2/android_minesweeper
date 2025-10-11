@@ -56,17 +56,11 @@ public class Controller {
     private boolean finished;
     private GameInfo gameInfo;
 
-    @NonNull
-    public GameInfo getResult() {
-        gameInfo.setInterval(activity.getTimer().getTime());
-        return gameInfo;
-    }
-
-
     public Controller(@NonNull GameInfo gameInfo) {
         this(gameInfo.getHeight(), gameInfo.getWidth(), gameInfo.getMineCount());
         this.gameInfo = gameInfo;
     }
+
 
     /**
      * 构造函数
@@ -91,6 +85,19 @@ public class Controller {
         Toast.makeText(activity, "下次扫雷再见！", LENGTH_SHORT).show();
         activity.finish();
     }
+
+    @NonNull
+    public GameInfo getResult() {
+        gameInfo.setInterval(activity.getTimer().getTime());
+        return gameInfo;
+    }
+
+    private native boolean initMineFlags(int width, int height);
+
+    private native void refresh();
+
+    private native void flag(int row,int col);
+    private native boolean flagged(int row,int col);
 
     public boolean isFinished() {
         return finished = (finishedGrids.size() + mines == height * width);
@@ -314,7 +321,8 @@ public class Controller {
 
     public void open(@NonNull Grid start, boolean started) throws MineTriggeredException {
         Queue<Grid> queue = new LinkedList<>();
-        boolean[][] visited = new boolean[height][width];
+
+        refresh();
         final boolean[] refreshActivity = {true};
         if (finished) {
             Toast.makeText(activity, "游戏已结束", LENGTH_SHORT).show();
@@ -334,8 +342,7 @@ public class Controller {
             notOpened.forEach(n -> {
                 if (Objects.requireNonNull(n.getState()) == Grid.STATE.FLAG) {
                     flagCount.getAndIncrement();
-                }else
-                {
+                } else {
                     queue.add(n);
                 }
             });
@@ -361,10 +368,11 @@ public class Controller {
                 continue;
             }
             current.open();
-            visited[current.getRow()][current.getCol()] = true;
+//            visited[current.getRow()][current.getCol()] = true;
+            flag(current.getRow(),current.getCol());
             if (current.getSurroundingMines() > 0) continue;
             Stream<Grid> openCandidates = current.getNeighbors().stream().filter(
-                    grid -> !visited[grid.getRow()][grid.getCol()]
+                    grid -> !flagged(grid.getRow(),grid.getCol())
             );
             openCandidates.forEach(open_candidate_grid -> {
 //                if (openCandidates == null) return;
@@ -465,6 +473,7 @@ public class Controller {
         MainApplication.getInstance().getRecordDAO().recordGame(gameInfo);
     }
 
+    private native void freeFlagsMemory();
     /**
      * 显示所有格子 告诉用户输掉的原因
      */

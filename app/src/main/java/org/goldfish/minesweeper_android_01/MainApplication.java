@@ -19,22 +19,32 @@ import org.goldfish.minesweeper_android_01.persistance.database.RecordDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 
 public class MainApplication extends Application {
 
     public static final String TAG = MainApplication.class.toString();
     private static MainApplication instance = null;
+
+    static {
+        System.loadLibrary("minesweeper_android_01");
+    }
+
+    @Getter
     private RecordDAO recordDAO;
+    @Getter
     private GameCacheDAO gameCacheDAO;
 
-    private List<Integer> validEffectIds;
+    private final List<Integer> validEffectIds;
     private Vibrator vibrator;
 
     public MainApplication() {
-        validEffectIds = new ArrayList<>();
-        validEffectIds.add(VibrationEffect.EFFECT_TICK);
-        validEffectIds.add(VibrationEffect.EFFECT_CLICK);
-        validEffectIds.add(VibrationEffect.EFFECT_HEAVY_CLICK);
+        validEffectIds = List.of(
+                VibrationEffect.EFFECT_CLICK,
+                VibrationEffect.EFFECT_TICK,
+                VibrationEffect.EFFECT_HEAVY_CLICK
+        );
     }
 
     @NonNull
@@ -55,7 +65,7 @@ public class MainApplication extends Application {
         GameCacheDatabase gameCacheDatabase = Room
                 .databaseBuilder(this, GameCacheDatabase.class, "game_cache.db")
                 .allowMainThreadQueries()
-                .fallbackToDestructiveMigration( true)
+                .fallbackToDestructiveMigration(true)
                 .build();
         gameCacheDAO = gameCacheDatabase.dao();
 
@@ -68,7 +78,6 @@ public class MainApplication extends Application {
                 vibrator = vibratorManager.getDefaultVibrator();
             } else {
                 // 旧版本：继续使用旧方法（需 @SuppressLint 注解忽略弃用警告）
-
                 vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
             }
         } catch (Throwable ignored) {
@@ -84,15 +93,6 @@ public class MainApplication extends Application {
         if (getInstance().validEffectIds.stream().noneMatch(id -> id == effectId))
             return;
         vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
-    }
-
-
-    public RecordDAO getRecordDAO() {
-        return recordDAO;
-    }
-
-    public GameCacheDAO getGameCacheDAO() {
-        return gameCacheDAO;
     }
 
 
