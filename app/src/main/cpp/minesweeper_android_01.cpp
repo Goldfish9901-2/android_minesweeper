@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include "android/log.h"
+
 bool *flags;
 int WIDTH, HEIGHT;
 extern "C" JNIEXPORT void JNICALL
@@ -28,11 +29,12 @@ Java_org_goldfish_minesweeper_1android_101_logic_Controller_refresh(JNIEnv *env,
     flags ? memset(flags, 0, WIDTH * HEIGHT * sizeof(bool)) : nullptr;
 }
 extern "C" JNIEXPORT jboolean JNICALL
-Java_org_goldfish_minesweeper_1android_101_logic_Controller_initMineFlags([[maybe_unused]] JNIEnv *env,
-                                                                          [[maybe_unused]] jobject thiz,
-                                                                          jint width, jint height) {
+Java_org_goldfish_minesweeper_1android_101_logic_Controller_initMineFlaggedBuffer(
+        [[maybe_unused]] JNIEnv *env, [[maybe_unused]] jobject thiz, jint width, jint height) {
     flags = nullptr;
     WIDTH = width, HEIGHT = height;
+    auto field = env->GetFieldID(env->GetObjectClass(thiz),"mines", "I");
+    if (field == nullptr)return false;
     flags = static_cast<bool *>(calloc(height * width, sizeof(int *)));
     if (flags == nullptr)return false;
     return true;

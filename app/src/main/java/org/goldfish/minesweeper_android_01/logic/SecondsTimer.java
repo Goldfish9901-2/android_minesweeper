@@ -19,7 +19,7 @@ public class SecondsTimer extends Handler {
     /**
      * count a second
      */
-    private void time() {
+    private synchronized void time() {
         time.incrementAndGet();
         if (!timing.get()) return;
         postDelayed(this::time, 1000);

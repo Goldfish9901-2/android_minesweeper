@@ -78,7 +78,9 @@ public class Controller {
 
         this.used = 0;
         this.grids = new Grid[height][width];
+        this.gameInfo = GameInfo.builder().width(width).height(height).mineCount(mines).build();
         this.finished = false;
+        this.initMineFlaggedBuffer(width, height);
     }
 
     public static void promptAndExit(@NonNull Activity activity) {
@@ -92,12 +94,13 @@ public class Controller {
         return gameInfo;
     }
 
-    private native boolean initMineFlags(int width, int height);
+    private native boolean initMineFlaggedBuffer(int width, int height);
 
     private native void refresh();
 
-    private native void flag(int row,int col);
-    private native boolean flagged(int row,int col);
+    private native void flag(int row, int col);
+
+    private native boolean flagged(int row, int col);
 
     public boolean isFinished() {
         return finished = (finishedGrids.size() + mines == height * width);
@@ -206,8 +209,7 @@ public class Controller {
      *
      * @param chronometer 计时器
      */
-    public void setChronometer(@NonNull Chronometer chronometer)
-            throws NullPointerException {
+    public void setChronometer(@NonNull Chronometer chronometer) throws NullPointerException {
         this.chronometer = Objects.requireNonNull(chronometer);
     }
 
@@ -218,8 +220,7 @@ public class Controller {
      */
 
     public void generateMine(@NonNull Grid start) throws MineTriggeredException {
-        Log.i("Controller:generateMine",
-                "generateMine: " + "<" + start.getRow() + '-' + start.getCol() + '>');
+        Log.i("Controller:generateMine", "generateMine: " + "<" + start.getRow() + '-' + start.getCol() + '>');
         Set<Grid> invalidGrids = new LinkedHashSet<>();
         invalidGrids.add(start);
         invalidGrids.addAll(start.getNeighbors());
@@ -232,13 +233,7 @@ public class Controller {
         for (int i = 0; i < mines; ) {
             int h = (int) (Math.random() * height);
             int w = (int) (Math.random() * width);
-            boolean exist = invalidGrids
-                    .stream()
-                    .anyMatch(
-                            grid ->
-                                    grid.getRow() == h &&
-                                            grid.getCol() == w
-                    );
+            boolean exist = invalidGrids.stream().anyMatch(grid -> grid.getRow() == h && grid.getCol() == w);
 
             if (exist) continue;
             // loop exited because loc generated cannot be set mine
@@ -336,9 +331,7 @@ public class Controller {
                 return;
             }
             AtomicInteger flagCount = new AtomicInteger();
-            Stream<Grid> notOpened = start.getNeighbors().stream().filter(
-                    grid -> !(grid.getState() == Grid.STATE.OPEN)
-            );
+            Stream<Grid> notOpened = start.getNeighbors().stream().filter(grid -> !(grid.getState() == Grid.STATE.OPEN));
             notOpened.forEach(n -> {
                 if (Objects.requireNonNull(n.getState()) == Grid.STATE.FLAG) {
                     flagCount.getAndIncrement();
@@ -369,11 +362,9 @@ public class Controller {
             }
             current.open();
 //            visited[current.getRow()][current.getCol()] = true;
-            flag(current.getRow(),current.getCol());
+            flag(current.getRow(), current.getCol());
             if (current.getSurroundingMines() > 0) continue;
-            Stream<Grid> openCandidates = current.getNeighbors().stream().filter(
-                    grid -> !flagged(grid.getRow(),grid.getCol())
-            );
+            Stream<Grid> openCandidates = current.getNeighbors().stream().filter(grid -> !flagged(grid.getRow(), grid.getCol()));
             openCandidates.forEach(open_candidate_grid -> {
 //                if (openCandidates == null) return;
                 queue.add(open_candidate_grid);
@@ -394,11 +385,9 @@ public class Controller {
     public List<Grid> gridList() {
         synchronized (this) {
             List<Grid> list = new ArrayList<>();
-            if (grids == null)
-                return list;
+            if (grids == null) return list;
             for (Grid[] row : grids) {
-                if (row == null)
-                    continue;
+                if (row == null) continue;
                 list.addAll(Arrays.asList(row));
             }
             return list;
@@ -474,6 +463,7 @@ public class Controller {
     }
 
     private native void freeFlagsMemory();
+
     /**
      * 显示所有格子 告诉用户输掉的原因
      */

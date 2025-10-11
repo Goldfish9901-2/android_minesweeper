@@ -15,6 +15,9 @@ import org.goldfish.minesweeper_android_01.views.activities.GameActivity;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,9 +32,9 @@ import lombok.Setter;
  */
 //@SmartTable(name="游戏结果")
 @Entity
-public class GameInfo
-        extends Intent
-        implements ResultFieldNames {
+@AllArgsConstructor
+@Builder
+public class GameInfo extends Intent implements ResultFieldNames {
     @Setter
     @Getter
     @ColumnInfo
@@ -51,9 +54,13 @@ public class GameInfo
     protected int mineCount;
     @Nullable
     @ColumnInfo
+    @Getter
+    @Setter
     protected String difficulty_description;
     @Nullable
     @ColumnInfo
+    @Setter
+    @Getter
     protected Boolean win;
     @Getter
     @Setter
@@ -74,32 +81,6 @@ public class GameInfo
     @ColumnInfo
     protected LocalDateTime endLocalDateTime;
 
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
-        this.startLocalDateTime = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.of("+8"));
-    }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
-        this.endLocalDateTime = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.of("+8"));
-    }
-
-    @Nullable
-    public LocalDateTime getStartLocalDateTime() {
-        return startLocalDateTime;
-    }
-
-    @Nullable
-    public Boolean getWin() {
-        return win;
-    }
-
-    @Nullable
-    public LocalDateTime getEndLocalDateTime() {
-        return endLocalDateTime;
-    }
-
-
     public GameInfo(@NonNull Activity activity) {
         super(activity, GameActivity.class);
         startTime = -1L;
@@ -113,7 +94,6 @@ public class GameInfo
         endTime = -1L;
         win = null;
     }
-
 
     @NonNull
     public static GameInfo EASY(@NonNull Activity activity) {
@@ -146,14 +126,20 @@ public class GameInfo
         return gameInfo;
     }
 
-    @NonNull
-    public String getDifficultyDescription() {
-        return String.valueOf(difficulty_description);
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+        this.startLocalDateTime = LocalDateTime.ofEpochSecond(startTime, 0, ZoneOffset.of("+8"));
+    }
+
+    public void setEndTime(long endTime) {
+        this.endTime = endTime;
+        this.endLocalDateTime = LocalDateTime.ofEpochSecond(endTime, 0, ZoneOffset.of("+8"));
     }
 
 
-    public void setWin(@Nullable Boolean win) {
-        this.win = win;
+    @NonNull
+    public String getDifficultyDescription() {
+        return String.valueOf(difficulty_description);
     }
 
     public void start() {
@@ -169,28 +155,8 @@ public class GameInfo
 
 
     @NonNull
-    public String getDifficulty_description() {
-        return difficulty_description;
-    }
-
-    public void setDifficulty_description(@NonNull String difficulty_description) {
-        this.difficulty_description = difficulty_description;
-    }
-
-
-    @NonNull
     @Override
     public String toString() {
-        return "Result{" +
-                "\n\t win=" + win +
-                "\n\t interval=" + interval +
-                "\n\t start=" + startTime +
-                "\n\t end=" + endTime +
-                "\n\t id=" + id +
-                "\n\t height=" + height +
-                "\n\t width=" + width +
-                "\n\t mineCount=" + mineCount +
-                "\n\t difficulty_description='" + difficulty_description + '\'' +
-                '}';
+        return "Result{" + "\n\t win=" + win + "\n\t interval=" + interval + "\n\t start=" + startTime + "\n\t end=" + endTime + "\n\t id=" + id + "\n\t height=" + height + "\n\t width=" + width + "\n\t mineCount=" + mineCount + "\n\t difficulty_description='" + difficulty_description + '\'' + '}';
     }
 }
