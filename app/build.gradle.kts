@@ -8,6 +8,8 @@ android {
     namespace = "org.goldfish.minesweeper_android_01"
     compileSdk = 36
 
+    ndkVersion = "29.0.14206865"
+
     defaultConfig {
         applicationId = "org.goldfish.minesweeper_android_01"
         minSdk = 29
@@ -23,6 +25,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+            ndk.debugSymbolLevel = "FULL"
+        }
+        create("customDebugType") {
+            isDebuggable = true
+            ndk.debugSymbolLevel = "FULL"
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -50,6 +60,10 @@ android {
             version = "3.22.1"
         }
     }
+    dependenciesInfo {
+        includeInApk = true
+        includeInBundle = true
+    }
 }
 
 
@@ -62,6 +76,7 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+    implementation(libs.androidx.recyclerview)
 
     // 测试
     testImplementation(libs.junit)

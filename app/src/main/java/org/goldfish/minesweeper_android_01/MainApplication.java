@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.os.VibratorManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.room.Room;
@@ -31,14 +32,16 @@ public class MainApplication extends Application {
     @Getter
     private GameCacheDAO gameCacheDAO;
 
-    private List<Integer> validEffectIds;
+    private final List<Integer> validEffectIds=List.of(
+            VibrationEffect.EFFECT_TICK,
+            VibrationEffect.EFFECT_CLICK,
+            VibrationEffect.EFFECT_HEAVY_CLICK
+    );
     private Vibrator vibrator;
+    static {
 
+    }
     public MainApplication() {
-        validEffectIds = new ArrayList<>();
-        validEffectIds.add(VibrationEffect.EFFECT_TICK);
-        validEffectIds.add(VibrationEffect.EFFECT_CLICK);
-        validEffectIds.add(VibrationEffect.EFFECT_HEAVY_CLICK);
     }
 
     @NonNull
@@ -51,6 +54,9 @@ public class MainApplication extends Application {
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+        Log.e(TAG, "static initializer: " );
+        System.loadLibrary("minesweeper_android_01");
         RecordDatabase recordDatabase = Room
                 .databaseBuilder(this, RecordDatabase.class, "minesweeper.db")
                 .allowMainThreadQueries()

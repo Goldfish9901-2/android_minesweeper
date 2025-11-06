@@ -20,44 +20,44 @@
 
 #include <cstdlib>
 #include <cstring>
-#include "android/log.h"
+#include "minesweeper_log.h"
+#include "MineFlagBuffer.h"
 
-bool *flags;
-int WIDTH, HEIGHT;
-extern "C" JNIEXPORT void JNICALL
-Java_org_goldfish_minesweeper_1android_101_logic_Controller_refresh(JNIEnv *env, jobject thiz) {
-    flags ? memset(flags, 0, WIDTH * HEIGHT * sizeof(bool)) : nullptr;
-}
 extern "C" JNIEXPORT jboolean JNICALL
 Java_org_goldfish_minesweeper_1android_101_logic_Controller_initMineFlaggedBuffer(
-        [[maybe_unused]] JNIEnv *env, [[maybe_unused]] jobject thiz, jint width, jint height) {
-    flags = nullptr;
-    WIDTH = width, HEIGHT = height;
-    auto field = env->GetFieldID(env->GetObjectClass(thiz),"mines", "I");
-    if (field == nullptr)return false;
-    flags = static_cast<bool *>(calloc(height * width, sizeof(int *)));
-    if (flags == nullptr)return false;
+        JNIEnv*, jobject, jint width, jint height) {
+
+    try {
+        g_flagsBuffer = std::make_unique<MineFlagBuffer>(width, height);
+    } catch (const std::bad_alloc&) {
+        LOGE("flags: malloc failed");
+        return false;
+    }
+
+    LOGI("flags: malloc success %d,%d", width, height);
     return true;
 }
 
-inline int getLocation(int row, int col) {
-    return row * WIDTH + col;
+extern "C" JNIEXPORT void JNICALL
+Java_org_goldfish_minesweeper_1android_101_logic_Controller_refresh(
+        JNIEnv*, jobject) {
+    if (g_flagsBuffer) g_flagsBuffer->refresh();
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_org_goldfish_minesweeper_1android_101_logic_Controller_flag(JNIEnv *env, jobject thiz,
-                                                                 jint row, jint col) {
-    flags[getLocation(row, col)] = true;
+Java_org_goldfish_minesweeper_1android_101_logic_Controller_flag(
+        JNIEnv*, jobject, jint row, jint col) {
+    if (g_flagsBuffer) g_flagsBuffer->flag(row, col);
 }
+
 extern "C" JNIEXPORT jboolean JNICALL
-Java_org_goldfish_minesweeper_1android_101_logic_Controller_flagged(JNIEnv *env, jobject thiz,
-                                                                    jint row, jint col) {
-    return flags[getLocation(row, col)];
+Java_org_goldfish_minesweeper_1android_101_logic_Controller_flagged(
+        JNIEnv*, jobject, jint row, jint col) {
+    return g_flagsBuffer && g_flagsBuffer->flagged(row, col);
 }
+
 extern "C" JNIEXPORT void JNICALL
-Java_org_goldfish_minesweeper_1android_101_logic_Controller_freeFlagsMemory(JNIEnv *env,
-                                                                            jobject thiz) {
-    if (flags == nullptr)return;
-    free(flags);
-    flags = nullptr;
+Java_org_goldfish_minesweeper_1android_101_logic_Controller_freeFlagsMemory(
+        JNIEnv*, jobject) {
+    g_flagsBuffer.reset();
 }

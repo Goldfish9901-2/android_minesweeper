@@ -39,6 +39,9 @@ import java.util.stream.Stream;
  */
 
 public class Controller {
+    private static final String TAG = "Controller";
+
+    
     public final static String thrower = "GOLDFISH_CAUGHT";
     private final int height;
     private final int width;
