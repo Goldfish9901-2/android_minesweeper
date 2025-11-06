@@ -32,6 +32,9 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * {@code Grid} 游戏的基本单位 <br/>
  * 用于表示游戏中的一个格子
@@ -42,21 +45,17 @@ public class Grid
 //        extends AppCompatImageButton
         implements VibrationTypes, Comparable<Grid> {
 
+    @Setter
+    @Getter
     private int row = 0;
 
 
+    @Setter
+    @Getter
     private int col = 0;
     private STATE state;
     //    @Nullable
     private boolean mine;
-
-    public void setRow(int row) {
-        this.row = row;
-    }
-
-    public void setCol(int col) {
-        this.col = col;
-    }
 
     public void setState(@NonNull STATE state) {
         this.state = state;
@@ -120,14 +119,6 @@ public class Grid
         mine = true;
         surroundingMines = -1;
         return true;
-    }
-
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
     }
 
     @Nullable

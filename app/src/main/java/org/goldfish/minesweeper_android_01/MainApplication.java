@@ -19,12 +19,16 @@ import org.goldfish.minesweeper_android_01.persistance.database.RecordDatabase;
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Getter;
+
 
 public class MainApplication extends Application {
 
     public static final String TAG = MainApplication.class.toString();
     private static MainApplication instance = null;
+    @Getter
     private RecordDAO recordDAO;
+    @Getter
     private GameCacheDAO gameCacheDAO;
 
     private List<Integer> validEffectIds;
@@ -83,16 +87,7 @@ public class MainApplication extends Application {
             return;
         if (getInstance().validEffectIds.stream().noneMatch(id -> id == effectId))
             return;
-        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK));
-    }
-
-
-    public RecordDAO getRecordDAO() {
-        return recordDAO;
-    }
-
-    public GameCacheDAO getGameCacheDAO() {
-        return gameCacheDAO;
+        vibrator.vibrate(VibrationEffect.createPredefined(effectId));
     }
 
 
